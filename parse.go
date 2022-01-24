@@ -24,10 +24,11 @@ const (
 	// Based on 365.2425 days/year
 	SecondsPerYear  = 31556952
 	SecondsPerMonth = 2629746
+	SecondsPerWeek  = 604800
 )
 
 var (
-	OneYear, OneMonth time.Duration
+	OneYear, OneMonth, OneWeek time.Duration
 )
 
 func init() {
@@ -39,6 +40,11 @@ func init() {
 	}
 
 	OneMonth, err = time.ParseDuration(fmt.Sprintf("%ds", SecondsPerMonth))
+	if err != nil {
+		panic(err)
+	}
+
+	OneWeek, err = time.ParseDuration(fmt.Sprintf("%ds", SecondsPerWeek))
 	if err != nil {
 		panic(err)
 	}

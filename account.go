@@ -108,7 +108,7 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 		if err != nil {
 			return Account{}, err
 		}
-		distTime = distTime.Add(OneMonth)
+		distTime = distTime.Add(OneWeek)
 	}
 
 	// if there is a genesis distribution add it
@@ -125,7 +125,8 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 			Time:  distTime,
 			Regen: distAmount,
 		})
-		distTime = distTime.Add(OneMonth)
+		// adding one week
+		distTime = distTime.Add(OneWeek)
 	}
 
 	// add dust to first distribution
@@ -188,7 +189,7 @@ const (
 	URegenDenom = "uregen"
 )
 
-var tenE6 Dec = NewDecFromInt64(1000000)
+var tenE6 = NewDecFromInt64(1000000)
 
 func ToCosmosAccount(acc Account, genesisTime time.Time) (auth.AccountI, *bank.Balance, error) {
 	err := acc.Validate()
