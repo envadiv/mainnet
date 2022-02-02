@@ -17,11 +17,11 @@ func RequireDecEqual(t *testing.T, expected, actual Dec, msgAndArgs ...interface
 }
 
 func RequireAccountEqual(t *testing.T, expected, actual Account) {
-	RequireDecEqual(t, expected.TotalRegen, actual.TotalRegen, "TotalRegen")
+	RequireDecEqual(t, expected.TotalPassage, actual.TotalPassage, "TotalPassage")
 	require.Equal(t, expected.Address, actual.Address, "Address")
 	require.Equal(t, len(expected.Distributions), len(actual.Distributions), "len(Distributions)")
 	for i := 0; i < len(expected.Distributions); i++ {
 		require.Equal(t, expected.Distributions[i].Time, actual.Distributions[i].Time, "Distribution", i)
-		RequireDecEqual(t, expected.Distributions[i].Regen, actual.Distributions[i].Regen, "Distribution", i)
+		RequireDecEqual(t, expected.Distributions[i].Passage, actual.Distributions[i].Passage, "Distribution", i)
 	}
 }

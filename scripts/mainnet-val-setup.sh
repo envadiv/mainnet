@@ -27,7 +27,7 @@ fi
 source ~/.bashrc
 
 echo "CAUTION!"
-echo "-- If Regen was previously installed, the following step will remove ~/.passage from your system. Are you sure you would like to continue?--"
+echo "-- If Passage3d was previously installed, the following step will remove ~/.passage from your system. Are you sure you would like to continue?--"
 
 select yn in "Yes" "No"; do
     case $yn in
@@ -43,12 +43,12 @@ PERSISTENT_PEERS="69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,
 
 echo "install passage-ledger"
 git clone https://github.com/envadiv/Passage3d 
-cd ~/passage-ledger
+cd Passage3d
 git fetch
 git checkout v1.0.0
 make install
 
-echo "Regen Ledger has been installed succesfully!"
+echo "Passage3d has been installed successfully!"
 echo ""
 echo "-- Next we will need to set up your keys and moniker"
 echo "-- Please choose a name for your key --"
@@ -83,8 +83,8 @@ echo ""
 
 echo "----------Setting up your validator node------------"
 $DAEMON init --chain-id $CHAIN_ID $YOUR_NAME
-echo "------Downloading Regen Mainnet genesis--------"
-curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
+echo "------Downloading Passage3d Mainnet genesis--------"
+curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
 
 echo "----------Setting config for seed node---------"
 sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:26657#g' ~/.$DAEMON/config/config.toml

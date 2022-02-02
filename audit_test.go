@@ -34,30 +34,30 @@ func ExamplePrintAccountAudit() {
 
 	PrintAccountAudit([]Account{
 		{
-			Address:    addr0,
-			TotalRegen: ten,
+			Address:      addr0,
+			TotalPassage: ten,
 			Distributions: []Distribution{
 				{
-					Time:  genesisTime,
-					Regen: five,
+					Time:    genesisTime,
+					Passage: five,
 				},
 				{
-					Time:  t1,
-					Regen: five,
+					Time:    t1,
+					Passage: five,
 				},
 			},
 		},
 		{
-			Address:    addr1,
-			TotalRegen: fifteen,
+			Address:      addr1,
+			TotalPassage: fifteen,
 			Distributions: []Distribution{
 				{
-					Time:  t0,
-					Regen: ten,
+					Time:    t0,
+					Passage: ten,
 				},
 				{
-					Time:  t1,
-					Regen: five,
+					Time:    t1,
+					Passage: five,
 				},
 			},
 		},

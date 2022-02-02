@@ -41,7 +41,7 @@ func mergeTwoAccounts(acc1, acc2 Account) (Account, error) {
 		return Account{}, fmt.Errorf("%s != %s", acc1.Address, acc2.Address)
 	}
 
-	newTotal, err := acc1.TotalRegen.Add(acc2.TotalRegen)
+	newTotal, err := acc1.TotalPassage.Add(acc2.TotalPassage)
 	if err != nil {
 		return Account{}, err
 	}
@@ -53,18 +53,18 @@ func mergeTwoAccounts(acc1, acc2 Account) (Account, error) {
 
 	for _, dist := range acc2.Distributions {
 		t := dist.Time
-		amount := dist.Regen
+		amount := dist.Passage
 		existing, ok := distMap[t]
 		if ok {
-			amount, err = amount.Add(existing.Regen)
+			amount, err = amount.Add(existing.Passage)
 			if err != nil {
 				return Account{}, err
 			}
 		}
 
 		distMap[t] = Distribution{
-			Time:  t,
-			Regen: amount,
+			Time:    t,
+			Passage: amount,
 		}
 	}
 
@@ -85,7 +85,7 @@ func mergeTwoAccounts(acc1, acc2 Account) (Account, error) {
 
 	return Account{
 		Address:       acc1.Address,
-		TotalRegen:    newTotal,
+		TotalPassage:  newTotal,
 		Distributions: distributions,
 	}, nil
 }

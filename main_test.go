@@ -36,7 +36,7 @@ pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz,200000.301,2020-06-19,2
 pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz,300000.0,MAINNET+1YEAR,2
 `
 
-const testCommunityPoolRegenAmount = 100000
+const testCommunityPoolPassage3DAmount = 100000
 
 func processStrings(tmplJson string, accountsCsv string, communityPoolRegen int) (string, string, error) {
 	doc, err := types.GenesisDocFromJSON([]byte(tmplJson))
@@ -59,7 +59,7 @@ func processStrings(tmplJson string, accountsCsv string, communityPoolRegen int)
 }
 
 func TestProcess(t *testing.T) {
-	json, auditOut, err := processStrings(testTemplate, testAccounts, testCommunityPoolRegenAmount)
+	json, auditOut, err := processStrings(testTemplate, testAccounts, testCommunityPoolPassage3DAmount)
 	require.NoError(t, err)
 	require.Equal(t,
 		`{
@@ -244,8 +244,8 @@ pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u	99999	1
 
 func TestBuildDistrMaccAndBalance(t *testing.T) {
 
-	testRegenAmount := 1000
-	testCoins, err := RegenToCoins(NewDecFromInt64(int64(testRegenAmount)))
+	testPassage3DAmount := 1000
+	testCoins, err := Passage3DToCoins(NewDecFromInt64(int64(testPassage3DAmount)))
 	require.NoError(t, err)
 
 	maccPerms := passage.GetMaccPerms()
@@ -256,7 +256,7 @@ func TestBuildDistrMaccAndBalance(t *testing.T) {
 		Address: testMacc.Address,
 	}
 
-	distrMacc, distrBalance, err := buildDistrMaccAndBalance(testRegenAmount)
+	distrMacc, distrBalance, err := buildDistrMaccAndBalance(testPassage3DAmount)
 	require.NoError(t, err)
 
 	require.Equal(t, testBalance, distrBalance)

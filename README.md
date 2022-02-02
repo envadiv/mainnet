@@ -1,4 +1,4 @@
-# Regen Network Mainnet
+# Passage3d Network Mainnet
 
 ## Building genesis.json (For admin use)
 
@@ -8,6 +8,7 @@ go run . build-genesis passage-1
 ```
 
 For pre-launch, we can ignore errors:
+
 ```shell
 go run . build-genesis passage-prelaunch-1 --errors-as-warnings
 ```
@@ -15,9 +16,11 @@ go run . build-genesis passage-prelaunch-1 --errors-as-warnings
 ## Join as a validator
 
 ### Requirements
-Check out these [instructions](./passage-1/README.md#Requirements) for installing `passage-ledger@v1.0.0`
+
+Check out these [instructions](./passage-1/README.md#Requirements) for installing `passage@v1.0.0`
 
 If you haven't initialized your node, init passage chain by running
+
 ```sh
 passage init --chain-id passage-1 <my_node_moniker>
 ```
@@ -41,7 +44,7 @@ passage init --chain-id passage-1 <my_node_moniker>
 
 - Step-2: Download the mainnet genesis
     ```sh
-    curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
+    curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
     ```
 
 - Step-3: Verify genesis

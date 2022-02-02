@@ -50,42 +50,42 @@ func TestMergeAccounts(t *testing.T) {
 			"merging two accounts basic",
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: ten,
+					Address:      addr0,
+					TotalPassage: ten,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 					},
 				},
 				{
-					Address:    addr0,
-					TotalRegen: ten,
+					Address:      addr0,
+					TotalPassage: ten,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: five,
+							Time:    time0,
+							Passage: five,
 						},
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 					},
 				},
 			},
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: twenty,
+					Address:      addr0,
+					TotalPassage: twenty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: fifteen,
+							Time:    time0,
+							Passage: fifteen,
 						},
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 					},
 				},
@@ -96,54 +96,54 @@ func TestMergeAccounts(t *testing.T) {
 			"merging two accounts, no common distr times",
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: twenty,
+					Address:      addr0,
+					TotalPassage: twenty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time2,
-							Regen: ten,
+							Time:    time2,
+							Passage: ten,
 						},
 					},
 				},
 				{
-					Address:    addr0,
-					TotalRegen: ten,
+					Address:      addr0,
+					TotalPassage: ten,
 					Distributions: []Distribution{
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 						{
-							Time:  time3,
-							Regen: five,
+							Time:    time3,
+							Passage: five,
 						},
 					},
 				},
 			},
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: thirty,
+					Address:      addr0,
+					TotalPassage: thirty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 						{
-							Time:  time2,
-							Regen: ten,
+							Time:    time2,
+							Passage: ten,
 						},
 						{
-							Time:  time3,
-							Regen: five,
+							Time:    time3,
+							Passage: five,
 						},
 					},
 				},
@@ -154,68 +154,68 @@ func TestMergeAccounts(t *testing.T) {
 			"merge accounts with all different addresses",
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: twenty,
+					Address:      addr0,
+					TotalPassage: twenty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time3,
-							Regen: ten,
+							Time:    time3,
+							Passage: ten,
 						},
 					},
 				},
 				{
-					Address:    addr1,
-					TotalRegen: thirty,
+					Address:      addr1,
+					TotalPassage: thirty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time1,
-							Regen: ten,
+							Time:    time1,
+							Passage: ten,
 						},
 						{
-							Time:  time2,
-							Regen: ten,
+							Time:    time2,
+							Passage: ten,
 						},
 					},
 				},
 			},
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: twenty,
+					Address:      addr0,
+					TotalPassage: twenty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time3,
-							Regen: ten,
+							Time:    time3,
+							Passage: ten,
 						},
 					},
 				},
 				{
-					Address:    addr1,
-					TotalRegen: thirty,
+					Address:      addr1,
+					TotalPassage: thirty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time1,
-							Regen: ten,
+							Time:    time1,
+							Passage: ten,
 						},
 						{
-							Time:  time2,
-							Regen: ten,
+							Time:    time2,
+							Passage: ten,
 						},
 					},
 				},
@@ -226,92 +226,92 @@ func TestMergeAccounts(t *testing.T) {
 			"merge complex accounts with overlapping distributions",
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: fifteen,
+					Address:      addr0,
+					TotalPassage: fifteen,
 					Distributions: []Distribution{
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 						{
-							Time:  time2,
-							Regen: five,
+							Time:    time2,
+							Passage: five,
 						},
 						{
-							Time:  time3,
-							Regen: five,
+							Time:    time3,
+							Passage: five,
 						},
 					},
 				},
 				{
-					Address:    addr0,
-					TotalRegen: twenty,
+					Address:      addr0,
+					TotalPassage: twenty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 						{
-							Time:  time2,
-							Regen: five,
+							Time:    time2,
+							Passage: five,
 						},
 					},
 				},
 				{
-					Address:    addr0,
-					TotalRegen: five,
+					Address:      addr0,
+					TotalPassage: five,
 					Distributions: []Distribution{
 						{
-							Time:  time1,
-							Regen: five,
+							Time:    time1,
+							Passage: five,
 						},
 					},
 				},
 				{
-					Address:    addr1,
-					TotalRegen: thirty,
+					Address:      addr1,
+					TotalPassage: thirty,
 					Distributions: []Distribution{
 						{
-							Time:  time4,
-							Regen: thirty,
+							Time:    time4,
+							Passage: thirty,
 						},
 					},
 				},
 			},
 			[]Account{
 				{
-					Address:    addr0,
-					TotalRegen: forty,
+					Address:      addr0,
+					TotalPassage: forty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time1,
-							Regen: fifteen,
+							Time:    time1,
+							Passage: fifteen,
 						},
 						{
-							Time:  time2,
-							Regen: ten,
+							Time:    time2,
+							Passage: ten,
 						},
 						{
-							Time:  time3,
-							Regen: five,
+							Time:    time3,
+							Passage: five,
 						},
 					},
 				},
 				{
-					Address:    addr1,
-					TotalRegen: thirty,
+					Address:      addr1,
+					TotalPassage: thirty,
 					Distributions: []Distribution{
 						{
-							Time:  time4,
-							Regen: thirty,
+							Time:    time4,
+							Passage: thirty,
 						},
 					},
 				},
@@ -323,24 +323,24 @@ func TestMergeAccounts(t *testing.T) {
 			[]Account{
 				{
 					Address:       addr0,
-					TotalRegen:    twenty,
+					TotalPassage:  twenty,
 					Distributions: []Distribution{},
 				},
 				{
-					Address:    addr1,
-					TotalRegen: thirty,
+					Address:      addr1,
+					TotalPassage: thirty,
 					Distributions: []Distribution{
 						{
-							Time:  time0,
-							Regen: ten,
+							Time:    time0,
+							Passage: ten,
 						},
 						{
-							Time:  time1,
-							Regen: ten,
+							Time:    time1,
+							Passage: ten,
 						},
 						{
-							Time:  time2,
-							Regen: ten,
+							Time:    time2,
+							Passage: ten,
 						},
 					},
 				},

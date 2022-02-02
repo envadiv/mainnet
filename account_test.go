@@ -14,11 +14,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRegenToCoins(t *testing.T) {
+func TestPassage3DToCoins(t *testing.T) {
 	one, err := NewDecFromString("1")
 	require.NoError(t, err)
 
-	coins, err := RegenToCoins(one)
+	coins, err := Passage3DToCoins(one)
 	require.NoError(t, err)
 	require.Equal(t, "1000000upasg", coins.String())
 }
@@ -55,12 +55,12 @@ func TestToCosmosAccount(t *testing.T) {
 		{
 			"one distribution at mainnet",
 			Account{
-				Address:    addr0,
-				TotalRegen: ten,
+				Address:      addr0,
+				TotalPassage: ten,
 				Distributions: []Distribution{
 					{
-						Time:  time0,
-						Regen: ten,
+						Time:    time0,
+						Passage: ten,
 					},
 				},
 			},
@@ -69,19 +69,19 @@ func TestToCosmosAccount(t *testing.T) {
 			},
 			&bank.Balance{
 				Address: addr0.String(),
-				Coins:   sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 10000000)),
+				Coins:   sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 10000000)),
 			},
 			false,
 		},
 		{
 			"one distribution at mainnet bad balance",
 			Account{
-				Address:    addr0,
-				TotalRegen: ten,
+				Address:      addr0,
+				TotalPassage: ten,
 				Distributions: []Distribution{
 					{
-						Time:  time0,
-						Regen: five,
+						Time:    time0,
+						Passage: five,
 					},
 				},
 			},
@@ -92,12 +92,12 @@ func TestToCosmosAccount(t *testing.T) {
 		{
 			"one distribution after mainnet",
 			Account{
-				Address:    addr1,
-				TotalRegen: five,
+				Address:      addr1,
+				TotalPassage: five,
 				Distributions: []Distribution{
 					{
-						Time:  time1,
-						Regen: five,
+						Time:    time1,
+						Passage: five,
 					},
 				},
 			},
@@ -106,29 +106,29 @@ func TestToCosmosAccount(t *testing.T) {
 					BaseAccount: &auth.BaseAccount{
 						Address: addr1.String(),
 					},
-					OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 5000000)),
+					OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 5000000)),
 					EndTime:         time1.Unix(),
 				},
 			},
 			&bank.Balance{
 				Address: addr1.String(),
-				Coins:   sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 5000000)),
+				Coins:   sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 5000000)),
 			},
 			false,
 		},
 		{
 			"two distributions",
 			Account{
-				Address:    addr1,
-				TotalRegen: ten,
+				Address:      addr1,
+				TotalPassage: ten,
 				Distributions: []Distribution{
 					{
-						Time:  time0,
-						Regen: five,
+						Time:    time0,
+						Passage: five,
 					},
 					{
-						Time:  time1,
-						Regen: five,
+						Time:    time1,
+						Passage: five,
 					},
 				},
 			},
@@ -137,48 +137,48 @@ func TestToCosmosAccount(t *testing.T) {
 					BaseAccount: &auth.BaseAccount{
 						Address: addr1.String(),
 					},
-					OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 10000000)),
+					OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 10000000)),
 					EndTime:         time1.Unix(),
 				},
 				StartTime: time0.Unix(),
 				VestingPeriods: []vesting.Period{
 					{
 						Length: 0,
-						Amount: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 5000000)),
+						Amount: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 5000000)),
 					},
 					{
 						Length: int64(time1.Sub(time0).Seconds()),
-						Amount: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 5000000)),
+						Amount: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 5000000)),
 					},
 				},
 			},
 			&bank.Balance{
 				Address: addr1.String(),
-				Coins:   sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 10000000)),
+				Coins:   sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 10000000)),
 			},
 			false,
 		},
 		{
 			"four distributions",
 			Account{
-				Address:    addr1,
-				TotalRegen: thirty,
+				Address:      addr1,
+				TotalPassage: thirty,
 				Distributions: []Distribution{
 					{
-						Time:  time0,
-						Regen: five,
+						Time:    time0,
+						Passage: five,
 					},
 					{
-						Time:  time1,
-						Regen: ten,
+						Time:    time1,
+						Passage: ten,
 					},
 					{
-						Time:  time2,
-						Regen: five,
+						Time:    time2,
+						Passage: five,
 					},
 					{
-						Time:  time3,
-						Regen: ten,
+						Time:    time3,
+						Passage: ten,
 					},
 				},
 			},
@@ -187,48 +187,48 @@ func TestToCosmosAccount(t *testing.T) {
 					BaseAccount: &auth.BaseAccount{
 						Address: addr1.String(),
 					},
-					OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 30000000)),
+					OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 30000000)),
 					EndTime:         time3.Unix(),
 				},
 				StartTime: time0.Unix(),
 				VestingPeriods: []vesting.Period{
 					{
 						Length: 0,
-						Amount: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 5000000)),
+						Amount: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 5000000)),
 					},
 					{
 						Length: int64(time1.Sub(time0).Seconds()),
-						Amount: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 10000000)),
+						Amount: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 10000000)),
 					},
 					{
 						Length: int64(time2.Sub(time1).Seconds()),
-						Amount: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 5000000)),
+						Amount: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 5000000)),
 					},
 					{
 						Length: int64(time3.Sub(time2).Seconds()),
-						Amount: sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 10000000)),
+						Amount: sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 10000000)),
 					},
 				},
 			},
 			&bank.Balance{
 				Address: addr1.String(),
-				Coins:   sdk.NewCoins(sdk.NewInt64Coin(URegenDenom, 30000000)),
+				Coins:   sdk.NewCoins(sdk.NewInt64Coin(UPassageDenom, 30000000)),
 			},
 			false,
 		},
 		{
 			"two distributions bad balance",
 			Account{
-				Address:    addr0,
-				TotalRegen: ten,
+				Address:      addr0,
+				TotalPassage: ten,
 				Distributions: []Distribution{
 					{
-						Time:  time0,
-						Regen: five,
+						Time:    time0,
+						Passage: five,
 					},
 					{
-						Time:  time1,
-						Regen: ten,
+						Time:    time1,
+						Passage: ten,
 					},
 				},
 			},
@@ -309,18 +309,18 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"one dist at genesis",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             five,
-				StartTime:               genesisTime,
+				Address:                addr0,
+				TotalAmount:            five,
+				StartTime:              genesisTime,
 				NumWeeklyDistributions: 1,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: five,
+				Address:      addr0,
+				TotalPassage: five,
 				Distributions: []Distribution{
 					{
-						Time:  genesisTime,
-						Regen: five,
+						Time:    genesisTime,
+						Passage: five,
 					},
 				},
 			},
@@ -329,22 +329,22 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"two dists from genesis",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             ten000001,
-				StartTime:               genesisTime,
+				Address:                addr0,
+				TotalAmount:            ten000001,
+				StartTime:              genesisTime,
 				NumWeeklyDistributions: 2,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: ten000001,
+				Address:      addr0,
+				TotalPassage: ten000001,
 				Distributions: []Distribution{
 					{
-						Time:  genesisTime,
-						Regen: five000001,
+						Time:    genesisTime,
+						Passage: five000001,
 					},
 					{
-						Time:  oneMonthAfterGenesis,
-						Regen: five,
+						Time:    oneMonthAfterGenesis,
+						Passage: five,
 					},
 				},
 			},
@@ -353,18 +353,18 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"two dists all from before genesis",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             ten000001,
-				StartTime:               start0,
+				Address:                addr0,
+				TotalAmount:            ten000001,
+				StartTime:              start0,
 				NumWeeklyDistributions: 2,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: ten000001,
+				Address:      addr0,
+				TotalPassage: ten000001,
 				Distributions: []Distribution{
 					{
-						Time:  genesisTime,
-						Regen: ten000001,
+						Time:    genesisTime,
+						Passage: ten000001,
 					},
 				},
 			},
@@ -373,22 +373,22 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"four dists starting before genesis",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             ten000001,
-				StartTime:               twoMonthsBeforeGenesis,
+				Address:                addr0,
+				TotalAmount:            ten000001,
+				StartTime:              twoMonthsBeforeGenesis,
 				NumWeeklyDistributions: 4,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: ten000001,
+				Address:      addr0,
+				TotalPassage: ten000001,
 				Distributions: []Distribution{
 					{
-						Time:  genesisTime,
-						Regen: seven500001,
+						Time:    genesisTime,
+						Passage: seven500001,
 					},
 					{
-						Time:  oneMonthAfterGenesis,
-						Regen: two5,
+						Time:    oneMonthAfterGenesis,
+						Passage: two5,
 					},
 				},
 			},
@@ -397,18 +397,18 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"one dist after genesis",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             ten000001,
-				StartTime:               oneMonthAfterGenesis,
+				Address:                addr0,
+				TotalAmount:            ten000001,
+				StartTime:              oneMonthAfterGenesis,
 				NumWeeklyDistributions: 1,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: ten000001,
+				Address:      addr0,
+				TotalPassage: ten000001,
 				Distributions: []Distribution{
 					{
-						Time:  oneMonthAfterGenesis,
-						Regen: ten000001,
+						Time:    oneMonthAfterGenesis,
+						Passage: ten000001,
 					},
 				},
 			},
@@ -417,22 +417,22 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"two dists after genesis",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             ten000001,
-				StartTime:               oneMonthAfterGenesis,
+				Address:                addr0,
+				TotalAmount:            ten000001,
+				StartTime:              oneMonthAfterGenesis,
 				NumWeeklyDistributions: 2,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: ten000001,
+				Address:      addr0,
+				TotalPassage: ten000001,
 				Distributions: []Distribution{
 					{
-						Time:  oneMonthAfterGenesis,
-						Regen: five000001,
+						Time:    oneMonthAfterGenesis,
+						Passage: five000001,
 					},
 					{
-						Time:  oneMonthAfterGenesis.Add(OneMonth),
-						Regen: five,
+						Time:    oneMonthAfterGenesis.Add(OneMonth),
+						Passage: five,
 					},
 				},
 			},
@@ -441,22 +441,22 @@ func TestRecordToAccount(t *testing.T) {
 		{
 			"two dists after genesis, 300000.0",
 			Record{
-				Address:                 addr0,
-				TotalAmount:             three00000,
-				StartTime:               oneMonthAfterGenesis,
+				Address:                addr0,
+				TotalAmount:            three00000,
+				StartTime:              oneMonthAfterGenesis,
 				NumWeeklyDistributions: 2,
 			},
 			Account{
-				Address:    addr0,
-				TotalRegen: three00000,
+				Address:      addr0,
+				TotalPassage: three00000,
 				Distributions: []Distribution{
 					{
-						Time:  oneMonthAfterGenesis,
-						Regen: one50000,
+						Time:    oneMonthAfterGenesis,
+						Passage: one50000,
 					},
 					{
-						Time:  oneMonthAfterGenesis.Add(OneMonth),
-						Regen: one50000,
+						Time:    oneMonthAfterGenesis.Add(OneMonth),
+						Passage: one50000,
 					},
 				},
 			},

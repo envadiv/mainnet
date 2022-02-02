@@ -26,7 +26,7 @@ func SortAccounts(accMap map[string]Account) []Account {
 
 func PrintAccountAudit(accounts []Account, genesisTime time.Time, writer io.Writer) {
 	for _, acc := range accounts {
-		_, err := fmt.Fprintf(writer, "%s\t%s\t%d\n", acc.Address, acc.TotalRegen, len(acc.Distributions))
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%d\n", acc.Address, acc.TotalPassage, len(acc.Distributions))
 		if err != nil {
 			panic(err)
 		}
@@ -37,7 +37,7 @@ func PrintAccountAudit(accounts []Account, genesisTime time.Time, writer io.Writ
 			} else {
 				timeStr = dist.Time.Format("2006-01-02 15:04:05")
 			}
-			_, err = fmt.Fprintf(writer, "\t%s\t%s\n", dist.Regen, timeStr)
+			_, err = fmt.Fprintf(writer, "\t%s\t%s\n", dist.Passage, timeStr)
 			if err != nil {
 				panic(err)
 			}

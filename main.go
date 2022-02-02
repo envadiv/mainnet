@@ -23,7 +23,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const CommunityPoolRegenAmount = 2_000_000
+const CommunityPoolPassage3DAmount = 2_000_000
 
 func main() {
 	rootCmd := &cobra.Command{}
@@ -49,7 +49,7 @@ func main() {
 
 			auditTsv, err := os.OpenFile(filepath.Join(genDir, "account_dump.tsv"), os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 
-			err = Process(doc, accountsCsv, CommunityPoolRegenAmount, auditTsv, errorsAsWarnings)
+			err = Process(doc, accountsCsv, CommunityPoolPassage3DAmount, auditTsv, errorsAsWarnings)
 			if err != nil {
 				return err
 			}
@@ -69,7 +69,7 @@ func main() {
 	}
 }
 
-func Process(doc *types.GenesisDoc, accountsCsv io.Reader, communityPoolRegen int, auditOutput io.Writer, errorsAsWarnings bool) error {
+func Process(doc *types.GenesisDoc, accountsCsv io.Reader, communityPoolPassage3D int, auditOutput io.Writer, errorsAsWarnings bool) error {
 	accounts, balances, err := buildAccounts(accountsCsv, doc.GenesisTime, auditOutput, errorsAsWarnings)
 	if err != nil {
 		return err
@@ -81,9 +81,9 @@ func Process(doc *types.GenesisDoc, accountsCsv io.Reader, communityPoolRegen in
 		return err
 	}
 
-	cdc, _ := passage.MakeCodecs()
+	cdc := passage.MakeTestEncodingConfig()
 
-	err = setAccounts(cdc, genState, accounts, balances, communityPoolRegen)
+	err = setAccounts(cdc.Marshaler, genState, accounts, balances, communityPoolPassage3D)
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func buildAccounts(accountsCsv io.Reader, genesisTime time.Time, auditOutput io.
 		return nil, nil, fmt.Errorf("error on MergeAccounts: %w", err)
 	}
 
-	err = AirdropRegenForMinFees(accMap, genesisTime)
+	err = AirdropPassage3DForMinFees(accMap, genesisTime)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -160,7 +160,7 @@ func buildAccounts(accountsCsv io.Reader, genesisTime time.Time, auditOutput io.
 	return authAccounts, balances, nil
 }
 
-func setAccounts(cdc codec.Marshaler, genesis map[string]json.RawMessage, accounts []auth.AccountI, balances []bank.Balance, communityPoolRegen int) error {
+func setAccounts(cdc codec.Codec, genesis map[string]json.RawMessage, accounts []auth.AccountI, balances []bank.Balance, communityPoolPassage3D int) error {
 	var bankGenesis bank.GenesisState
 
 	err := cdc.UnmarshalJSON(genesis[bank.ModuleName], &bankGenesis)
@@ -169,7 +169,7 @@ func setAccounts(cdc codec.Marshaler, genesis map[string]json.RawMessage, accoun
 	}
 
 	// create distribution module account and corresponding balance with community pool funded
-	distrMacc, distrBalance, err := buildDistrMaccAndBalance(communityPoolRegen)
+	distrMacc, distrBalance, err := buildDistrMaccAndBalance(communityPoolPassage3D)
 	if err != nil {
 		return err
 	}
@@ -227,7 +227,7 @@ func buildDistrMaccAndBalance(passageAmount int) (auth.ModuleAccountI, *bank.Bal
 	maccPerms := passage.GetMaccPerms()
 	distrMacc := auth.NewEmptyModuleAccount(distribution.ModuleName, maccPerms[distribution.ModuleName]...)
 
-	distrCoins, err := RegenToCoins(NewDecFromInt64(int64(passageAmount)))
+	distrCoins, err := Passage3DToCoins(NewDecFromInt64(int64(passageAmount)))
 	if err != nil {
 		return nil, nil, err
 	}

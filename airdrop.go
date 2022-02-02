@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const communityBootstrappingAddr = "pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u"
+const communityBootstrappingAddr = "pasg18h2lu29rwwkr5nfukghn80vx6gm9xxvv62zgyx"
 
 var one = NewDecFromInt64(1)
 
@@ -19,7 +19,7 @@ var airdropDenyList = []string{
 	"pasg1xv7pkdjtumtvakyfgwc7daknzxrdk8yhh9kng7",
 }
 
-func AirdropRegenForMinFees(accMap map[string]Account, genesisTime time.Time) error {
+func AirdropPassage3DForMinFees(accMap map[string]Account, genesisTime time.Time) error {
 	var totalAirdrop Dec
 	var err error
 	airdropDenyMap := make(map[string]bool)
@@ -45,7 +45,7 @@ func AirdropRegenForMinFees(accMap map[string]Account, genesisTime time.Time) er
 	}
 
 	bootstrapAcc := accMap[communityBootstrappingAddr]
-	bootstrapAcc.TotalRegen, err = bootstrapAcc.TotalRegen.Sub(totalAirdrop)
+	bootstrapAcc.TotalPassage, err = bootstrapAcc.TotalPassage.Sub(totalAirdrop)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func AirdropRegenForMinFees(accMap map[string]Account, genesisTime time.Time) er
 		return fmt.Errorf("problem with community bootstrap account")
 	}
 
-	bootstrapAcc.Distributions[0].Regen, err = bootstrapAcc.Distributions[0].Regen.Sub(totalAirdrop)
+	bootstrapAcc.Distributions[0].Passage, err = bootstrapAcc.Distributions[0].Passage.Sub(totalAirdrop)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func AirdropRegenForMinFees(accMap map[string]Account, genesisTime time.Time) er
 
 func airdrop1(acc Account, genesisTime time.Time) (Account, error) {
 	var err error
-	acc.TotalRegen, err = acc.TotalRegen.Add(one)
+	acc.TotalPassage, err = acc.TotalPassage.Add(one)
 	if err != nil {
 		return Account{}, err
 	}
@@ -76,12 +76,12 @@ func airdrop1(acc Account, genesisTime time.Time) (Account, error) {
 	}
 
 	if acc.Distributions[0].Time.Equal(genesisTime) {
-		acc.Distributions[0].Regen, err = acc.Distributions[0].Regen.Add(one)
+		acc.Distributions[0].Passage, err = acc.Distributions[0].Passage.Add(one)
 		if err != nil {
 			return Account{}, err
 		}
 	} else {
-		genesisDist := Distribution{Time: genesisTime, Regen: one}
+		genesisDist := Distribution{Time: genesisTime, Passage: one}
 		acc.Distributions = append([]Distribution{genesisDist}, acc.Distributions...)
 	}
 

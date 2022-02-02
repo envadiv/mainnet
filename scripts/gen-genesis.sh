@@ -1,13 +1,14 @@
 #!/bin/sh
 PASSAGE_HOME="/tmp/passage$(date +%s)"
 CHAIN_ID=passage-1
+DENOM=upasg
 
 set -e
 
-echo "...........Init Regen.............."
+echo "...........Init Passage3D.............."
 
-git clone https://github.com/envadiv/Passage3d
-cd passage-ledger
+git clone https://github.com/envadiv/Passage3D
+cd Passage3D
 git checkout v1.0.0-rc3
 make build
 chmod +x ./build/passage
@@ -40,4 +41,4 @@ killall passage >/dev/null 2>&1
 rm -rf $PASSAGE_HOME >/dev/null 2>&1
 
 cd ..
-rm -rf passage-ledger
+rm -rf Passage3D

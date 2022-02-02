@@ -14,22 +14,22 @@ import (
 // Account is an internal representation of a genesis passage account
 type Account struct {
 	Address       sdk.AccAddress
-	TotalRegen    Dec
+	TotalPassage  Dec
 	Distributions []Distribution
 }
 
 // Distribution is an internal representation of a genesis vesting distribution of passage
 type Distribution struct {
-	Time  time.Time
-	Regen Dec
+	Time    time.Time
+	Passage Dec
 }
 
 func (a Account) String() string {
-	return fmt.Sprintf("Account{%s, %spassage, %s}", a.Address, a.TotalRegen.String(), a.Distributions)
+	return fmt.Sprintf("Account{%s, %spassage, %s}", a.Address, a.TotalPassage.String(), a.Distributions)
 }
 
 func (d Distribution) String() string {
-	return fmt.Sprintf("Distribution{%s, %spassage}", d.Time.Format(time.RFC3339), d.Regen.String())
+	return fmt.Sprintf("Distribution{%s, %spassage}", d.Time.Format(time.RFC3339), d.Passage.String())
 }
 
 func (acc Account) Validate() error {
@@ -37,8 +37,8 @@ func (acc Account) Validate() error {
 		return fmt.Errorf("empty address")
 	}
 
-	if !acc.TotalRegen.IsPositive() {
-		return fmt.Errorf("expected positive balance, got %s", acc.TotalRegen.String())
+	if !acc.TotalPassage.IsPositive() {
+		return fmt.Errorf("expected positive balance, got %s", acc.TotalPassage.String())
 	}
 
 	var calcTotal Dec
@@ -48,14 +48,14 @@ func (acc Account) Validate() error {
 			return err
 		}
 
-		calcTotal, err = calcTotal.Add(dist.Regen)
+		calcTotal, err = calcTotal.Add(dist.Passage)
 		if err != nil {
 			return err
 		}
 	}
 
-	if !acc.TotalRegen.IsEqual(calcTotal) {
-		return fmt.Errorf("incorrect balance, expected %s, got %s", acc.TotalRegen.String(), calcTotal.String())
+	if !acc.TotalPassage.IsEqual(calcTotal) {
+		return fmt.Errorf("incorrect balance, expected %s, got %s", acc.TotalPassage.String(), calcTotal.String())
 	}
 
 	return nil
@@ -81,12 +81,12 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 
 	if numDist == 1 && !distTime.After(genesisTime) {
 		return Account{
-			Address:    rec.Address,
-			TotalRegen: amount,
+			Address:      rec.Address,
+			TotalPassage: amount,
 			Distributions: []Distribution{
 				{
-					Time:  genesisTime,
-					Regen: amount,
+					Time:    genesisTime,
+					Passage: amount,
 				},
 			},
 		}, nil
@@ -114,23 +114,23 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 	// if there is a genesis distribution add it
 	if !genesisAmount.IsZero() {
 		distributions = append(distributions, Distribution{
-			Time:  genesisTime,
-			Regen: genesisAmount,
+			Time:    genesisTime,
+			Passage: genesisAmount,
 		})
 	}
 
 	// add post genesis distributions
 	for ; numDist > 0; numDist-- {
 		distributions = append(distributions, Distribution{
-			Time:  distTime,
-			Regen: distAmount,
+			Time:    distTime,
+			Passage: distAmount,
 		})
 		// adding one week
 		distTime = distTime.Add(OneWeek)
 	}
 
 	// add dust to first distribution
-	distributions[0].Regen, err = distributions[0].Regen.Add(dust)
+	distributions[0].Passage, err = distributions[0].Passage.Add(dust)
 	if err != nil {
 		return Account{}, err
 	}
@@ -138,7 +138,7 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 	return Account{
 		Address:       rec.Address,
 		Distributions: distributions,
-		TotalRegen:    amount,
+		TotalPassage:  amount,
 	}, nil
 }
 
@@ -186,7 +186,7 @@ func distAmountAndDust(amount Dec, numDist int) (distAmount Dec, dust Dec, err e
 }
 
 const (
-	URegenDenom = "upasg"
+	UPassageDenom = "upasg"
 )
 
 var tenE6 = NewDecFromInt64(1000000)
@@ -197,7 +197,7 @@ func ToCosmosAccount(acc Account, genesisTime time.Time) (auth.AccountI, *bank.B
 		return nil, nil, err
 	}
 
-	totalCoins, err := RegenToCoins(acc.TotalRegen)
+	totalCoins, err := Passage3DToCoins(acc.TotalPassage)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -232,7 +232,7 @@ func ToCosmosAccount(acc Account, genesisTime time.Time) (auth.AccountI, *bank.B
 
 		var periods []vesting.Period
 		for _, dist := range acc.Distributions {
-			coins, err := RegenToCoins(dist.Regen)
+			coins, err := Passage3DToCoins(dist.Passage)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -260,7 +260,7 @@ func ToCosmosAccount(acc Account, genesisTime time.Time) (auth.AccountI, *bank.B
 	}
 }
 
-func RegenToCoins(passageAmount Dec) (sdk.Coins, error) {
+func Passage3DToCoins(passageAmount Dec) (sdk.Coins, error) {
 	upasg, err := passageAmount.Mul(tenE6)
 	if err != nil {
 		return nil, err
@@ -271,7 +271,7 @@ func RegenToCoins(passageAmount Dec) (sdk.Coins, error) {
 		return nil, err
 	}
 
-	return sdk.NewCoins(sdk.NewCoin(URegenDenom, sdk.NewInt(upasgInt64))), nil
+	return sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(upasgInt64))), nil
 }
 
 func ValidateVestingAccount(acc auth.AccountI) error {

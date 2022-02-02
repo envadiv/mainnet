@@ -49,7 +49,7 @@ else
     echo "...........Init Regen.............."
 
     git clone https://github.com/envadiv/Passage3d
-    cd passage-ledger
+    cd Passage3d
     git checkout v1.0.0-rc1
     make build
     chmod +x ./build/passage
@@ -60,7 +60,7 @@ else
 
     echo "..........Fetching genesis......."
     rm -rf $PASSAGE_HOME/config/genesis.json
-    curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/$CHAIN_ID/genesis-prelaunch.json >$PASSAGE_HOME/config/genesis.json
+    curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/$CHAIN_ID/genesis-prelaunch.json >$PASSAGE_HOME/config/genesis.json
 
     # this genesis time is different from original genesis time, just for validating gentx.
     sed -i '/genesis_time/c\   \"genesis_time\" : \"2021-03-29T00:00:00Z\",' $PASSAGE_HOME/config/genesis.json
