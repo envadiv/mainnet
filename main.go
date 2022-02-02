@@ -11,7 +11,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	passage "github.com/envadiv/Passage3d/app"
+	passage "github.com/envadiv/Passage3D/app"
 
 	"github.com/tendermint/tendermint/types"
 

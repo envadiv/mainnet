@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/envadiv/Passage3d/app"
+	"github.com/envadiv/Passage3D/app"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

@@ -8,7 +8,7 @@ import (
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distribution "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	passage "github.com/envadiv/Passage3d/app"
+	passage "github.com/envadiv/Passage3D/app"
 
 	"github.com/stretchr/testify/require"
 
