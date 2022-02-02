@@ -20,7 +20,7 @@ func TestRegenToCoins(t *testing.T) {
 
 	coins, err := RegenToCoins(one)
 	require.NoError(t, err)
-	require.Equal(t, "1000000uregen", coins.String())
+	require.Equal(t, "1000000upasg", coins.String())
 }
 
 func TestToCosmosAccount(t *testing.T) {
@@ -312,7 +312,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             five,
 				StartTime:               genesisTime,
-				NumMonthlyDistributions: 1,
+				NumWeeklyDistributions: 1,
 			},
 			Account{
 				Address:    addr0,
@@ -332,7 +332,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             ten000001,
 				StartTime:               genesisTime,
-				NumMonthlyDistributions: 2,
+				NumWeeklyDistributions: 2,
 			},
 			Account{
 				Address:    addr0,
@@ -356,7 +356,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             ten000001,
 				StartTime:               start0,
-				NumMonthlyDistributions: 2,
+				NumWeeklyDistributions: 2,
 			},
 			Account{
 				Address:    addr0,
@@ -376,7 +376,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             ten000001,
 				StartTime:               twoMonthsBeforeGenesis,
-				NumMonthlyDistributions: 4,
+				NumWeeklyDistributions: 4,
 			},
 			Account{
 				Address:    addr0,
@@ -400,7 +400,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             ten000001,
 				StartTime:               oneMonthAfterGenesis,
-				NumMonthlyDistributions: 1,
+				NumWeeklyDistributions: 1,
 			},
 			Account{
 				Address:    addr0,
@@ -420,7 +420,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             ten000001,
 				StartTime:               oneMonthAfterGenesis,
-				NumMonthlyDistributions: 2,
+				NumWeeklyDistributions: 2,
 			},
 			Account{
 				Address:    addr0,
@@ -444,7 +444,7 @@ func TestRecordToAccount(t *testing.T) {
 				Address:                 addr0,
 				TotalAmount:             three00000,
 				StartTime:               oneMonthAfterGenesis,
-				NumMonthlyDistributions: 2,
+				NumWeeklyDistributions: 2,
 			},
 			Account{
 				Address:    addr0,

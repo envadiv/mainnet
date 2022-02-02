@@ -4,35 +4,35 @@
 
 Execute:
 ```shell
-go run . build-genesis regen-1
+go run . build-genesis passage-1
 ```
 
 For pre-launch, we can ignore errors:
 ```shell
-go run . build-genesis regen-prelaunch-1 --errors-as-warnings
+go run . build-genesis passage-prelaunch-1 --errors-as-warnings
 ```
 
 ## Join as a validator
 
 ### Requirements
-Check out these [instructions](./regen-1/README.md#Requirements) for installing `regen-ledger@v1.0.0`
+Check out these [instructions](./passage-1/README.md#Requirements) for installing `passage-ledger@v1.0.0`
 
-If you haven't initialized your node, init regen chain by running
+If you haven't initialized your node, init passage chain by running
 ```sh
-regen init --chain-id regen-1 <my_node_moniker>
+passage init --chain-id passage-1 <my_node_moniker>
 ```
 
 ### Start your validator node
 
 - Step-1: Verify installation
     ```sh
-    regen version --long
+    passage version --long
     ```
 
     it should display the following details:
     ```sh
-    name: regen
-    server_name: regen
+    name: passage
+    server_name: passage
     version: v1.0.0
     commit: 1b7c80ef102d3ae7cc40bba3ceccd97a64dadbfd
     build_tags: netgo,ledger
@@ -41,18 +41,18 @@ regen init --chain-id regen-1 <my_node_moniker>
 
 - Step-2: Download the mainnet genesis
     ```sh
-    curl -s https://raw.githubusercontent.com/regen-network/mainnet/main/regen-1/genesis.json > ~/.regen/config/genesis.json
+    curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
     ```
 
 - Step-3: Verify genesis
     ```sh
-    jq -S -c -M '' ~/.regen/config/genesis.json | shasum -a 256
+    jq -S -c -M '' ~/.passage/config/genesis.json | shasum -a 256
     ```
-    It should be equal to the contents in [checksum](regen-1/checksum.txt)
+    It should be equal to the contents in [checksum](passage-1/checksum.txt)
 
 - Step-4: Update seeds and persistent peers
 
-    Open `~/.regen/config/config.toml` and update `persistent_peers` and `seeds` (comma separated list)
+    Open `~/.passage/config/config.toml` and update `persistent_peers` and `seeds` (comma separated list)
     #### Persistent peers
     ```sh
     69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,d35d652b6cb3bf7d6cb8d4bd7c036ea03e7be2ab@116.203.182.185:26656,ffacd3202ded6945fed12fa4fd715b1874985b8c@3.98.38.91:26656
@@ -64,10 +64,10 @@ regen init --chain-id regen-1 <my_node_moniker>
 
 - Step-5: Create systemd
     ```sh
-    DAEMON_PATH=$(which regen)
+    DAEMON_PATH=$(which passage)
 
     echo "[Unit]
-    Description=regen daemon
+    Description=passage daemon
     After=network-online.target
     [Service]
     User=${USER}
@@ -77,22 +77,22 @@ regen init --chain-id regen-1 <my_node_moniker>
     LimitNOFILE=4096
     [Install]
     WantedBy=multi-user.target
-    " >regen.service
+    " >passage.service
     ```
 
-- Step-6: Update system daemon and start regen node
+- Step-6: Update system daemon and start passage node
 
     ```
-    sudo mv regen.service /lib/systemd/system/regen.service
+    sudo mv passage.service /lib/systemd/system/passage.service
     sudo -S systemctl daemon-reload
-    sudo -S systemctl enable regen
-    sudo -S systemctl start regen
+    sudo -S systemctl enable passage
+    sudo -S systemctl start passage
     ```
 
 That's all! Your node should be up and running now. You can query your node by executing the following command after the genesis time
 
 ```sh
-regen status
+passage status
 ```
 
 ### Create validator (Optional)
@@ -101,11 +101,11 @@ Note: This section is applicable for validators who wants to join post genesis t
 > **IMPORTANT:** Make sure your validator node is fully synced before running this command. Otherwise your validator will start missing blocks.
 
 ```sh
-regen tx staking create-validator \
-  --amount=9000000uregen \
-  --pubkey=$(regen tendermint show-validator) \
+passage tx staking create-validator \
+  --amount=9000000upasg \
+  --pubkey=$(passage tendermint show-validator) \
   --moniker="<your_moniker>" \
-  --chain-id=regen-1 \
+  --chain-id=passage-1 \
   --commission-rate="0.10" \
   --commission-max-rate="0.20" \
   --commission-max-change-rate="0.01" \

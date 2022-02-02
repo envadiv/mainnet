@@ -11,25 +11,25 @@ import (
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-// Account is an internal representation of a genesis regen account
+// Account is an internal representation of a genesis passage account
 type Account struct {
 	Address       sdk.AccAddress
 	TotalRegen    Dec
 	Distributions []Distribution
 }
 
-// Distribution is an internal representation of a genesis vesting distribution of regen
+// Distribution is an internal representation of a genesis vesting distribution of passage
 type Distribution struct {
 	Time  time.Time
 	Regen Dec
 }
 
 func (a Account) String() string {
-	return fmt.Sprintf("Account{%s, %sregen, %s}", a.Address, a.TotalRegen.String(), a.Distributions)
+	return fmt.Sprintf("Account{%s, %spassage, %s}", a.Address, a.TotalRegen.String(), a.Distributions)
 }
 
 func (d Distribution) String() string {
-	return fmt.Sprintf("Distribution{%s, %sregen}", d.Time.Format(time.RFC3339), d.Regen.String())
+	return fmt.Sprintf("Distribution{%s, %spassage}", d.Time.Format(time.RFC3339), d.Regen.String())
 }
 
 func (acc Account) Validate() error {
@@ -74,7 +74,7 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 	if distTime.IsZero() {
 		return Account{}, fmt.Errorf("require a non-zero distribution time")
 	}
-	numDist := rec.NumMonthlyDistributions
+	numDist := rec.NumWeeklyDistributions
 	if numDist < 1 {
 		return Account{}, fmt.Errorf("numDist must be >= 1, got %d", numDist)
 	}
@@ -92,7 +92,7 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 		}, nil
 	}
 
-	// calculate dust, which represents an uregen-integral remainder, represented as a decimal value of regen
+	// calculate dust, which represents an upasg-integral remainder, represented as a decimal value of passage
 	// from dividing `amount` by `numDist`
 	distAmount, dust, err := distAmountAndDust(amount, numDist)
 	if err != nil {
@@ -153,13 +153,13 @@ func distAmountAndDust(amount Dec, numDist int) (distAmount Dec, dust Dec, err e
 
 	numDistDec := NewDecFromInt64(int64(numDist))
 
-	// convert amount from regen to uregen, so we can perform integral arithmetic on uregen
+	// convert amount from passage to upasg, so we can perform integral arithmetic on upasg
 	amount, err = amount.Mul(tenE6)
 	if err != nil {
 		return distAmount, dust, err
 	}
 
-	// each distribution is an integral amount of uregen
+	// each distribution is an integral amount of upasg
 	distAmount, err = amount.QuoInteger(numDistDec)
 	if err != nil {
 		return distAmount, dust, err
@@ -170,13 +170,13 @@ func distAmountAndDust(amount Dec, numDist int) (distAmount Dec, dust Dec, err e
 		return distAmount, dust, err
 	}
 
-	// convert distAmount from uregen back to regen
+	// convert distAmount from upasg back to passage
 	distAmount, err = distAmount.Quo(tenE6)
 	if err != nil {
 		return distAmount, dust, err
 	}
 
-	// convert dust from uregen back to regen
+	// convert dust from upasg back to passage
 	dust, err = dust.Quo(tenE6)
 	if err != nil {
 		return distAmount, dust, err
@@ -186,7 +186,7 @@ func distAmountAndDust(amount Dec, numDist int) (distAmount Dec, dust Dec, err e
 }
 
 const (
-	URegenDenom = "uregen"
+	URegenDenom = "upasg"
 )
 
 var tenE6 = NewDecFromInt64(1000000)
@@ -260,18 +260,18 @@ func ToCosmosAccount(acc Account, genesisTime time.Time) (auth.AccountI, *bank.B
 	}
 }
 
-func RegenToCoins(regenAmount Dec) (sdk.Coins, error) {
-	uregen, err := regenAmount.Mul(tenE6)
+func RegenToCoins(passageAmount Dec) (sdk.Coins, error) {
+	upasg, err := passageAmount.Mul(tenE6)
 	if err != nil {
 		return nil, err
 	}
 
-	uregenInt64, err := uregen.Int64()
+	upasgInt64, err := upasg.Int64()
 	if err != nil {
 		return nil, err
 	}
 
-	return sdk.NewCoins(sdk.NewCoin(URegenDenom, sdk.NewInt(uregenInt64))), nil
+	return sdk.NewCoins(sdk.NewCoin(URegenDenom, sdk.NewInt(upasgInt64))), nil
 }
 
 func ValidateVestingAccount(acc auth.AccountI) error {

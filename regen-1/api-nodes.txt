@@ -1,2 +1,0 @@
-http://public-rpc.regen.vitwit.com:1317
-https://regen.stakesystems.io

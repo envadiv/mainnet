@@ -1,3 +1,0 @@
-http://public-rpc.regen.vitwit.com:26657
-https://regen.stakesystems.io:2053
-http://rpc.regen.forbole.com:80

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/regen-network/regen-ledger/app"
+	"github.com/envadiv/Passage3d/app"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -17,7 +17,7 @@ type Record struct {
 	Address                 sdk.AccAddress
 	TotalAmount             Dec
 	StartTime               time.Time
-	NumMonthlyDistributions int
+	NumWeeklyDistributions int
 }
 
 const (
@@ -113,7 +113,7 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 		Address:                 addr,
 		TotalAmount:             amount,
 		StartTime:               startTime,
-		NumMonthlyDistributions: numDist,
+		NumWeeklyDistributions: numDist,
 	}, nil
 
 }
@@ -122,5 +122,5 @@ func (r Record) Equal(o Record) bool {
 	return r.StartTime.Equal(o.StartTime) &&
 		r.TotalAmount.IsEqual(o.TotalAmount) &&
 		r.Address.Equals(o.Address) &&
-		r.NumMonthlyDistributions == o.NumMonthlyDistributions
+		r.NumWeeklyDistributions == o.NumWeeklyDistributions
 }

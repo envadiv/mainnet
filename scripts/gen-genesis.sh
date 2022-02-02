@@ -1,39 +1,43 @@
 #!/bin/sh
-REGEN_HOME="/tmp/regen$(date +%s)"
-CHAIN_ID=regen-1
+PASSAGE_HOME="/tmp/passage$(date +%s)"
+CHAIN_ID=passage-1
 
 set -e
 
 echo "...........Init Regen.............."
 
-git clone https://github.com/regen-network/regen-ledger
-cd regen-ledger
+git clone https://github.com/envadiv/Passage3d
+cd passage-ledger
 git checkout v1.0.0-rc3
 make build
-chmod +x ./build/regen
+chmod +x ./build/passage
 
-./build/regen init --chain-id $CHAIN_ID validator --home $REGEN_HOME
+./build/passage init --chain-id $CHAIN_ID validator --home $PASSAGE_HOME
 
 echo "..........Fetching genesis......."
-rm -rf $REGEN_HOME/config/genesis.json
-cp ../$CHAIN_ID/genesis-prelaunch.json $REGEN_HOME/config/genesis.json
+rm -rf $PASSAGE_HOME/config/genesis.json
+cp ../$CHAIN_ID/genesis-prelaunch.json $PASSAGE_HOME/config/genesis.json
+
+sed -i "s/172800000000000/600000000000/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/172800s/600s/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
 
 echo "..........Collecting gentxs......."
-./build/regen collect-gentxs --home $REGEN_HOME --gentx-dir ../$CHAIN_ID/gentxs
+./build/passage collect-gentxs --home $PASSAGE_HOME --gentx-dir ../$CHAIN_ID/gentxs
 
-./build/regen validate-genesis --home $REGEN_HOME
+./build/passage validate-genesis --home $PASSAGE_HOME
 
-cp $REGEN_HOME/config/genesis.json ../$CHAIN_ID/genesis.json
+cp $PASSAGE_HOME/config/genesis.json ../$CHAIN_ID/genesis.json
 jq -S -c -M '' ../$CHAIN_ID/genesis.json | shasum -a 256 > ../$CHAIN_ID/checksum.txt
 
 echo "..........Starting node......."
-./build/regen start --home $REGEN_HOME &
+./build/passage start --home $PASSAGE_HOME &
 
 sleep 5s
 
 echo "...Cleaning the stuff..."
-killall regen >/dev/null 2>&1
-rm -rf $REGEN_HOME >/dev/null 2>&1
+killall passage >/dev/null 2>&1
+rm -rf $PASSAGE_HOME >/dev/null 2>&1
 
 cd ..
-rm -rf regen-ledger
+rm -rf passage-ledger

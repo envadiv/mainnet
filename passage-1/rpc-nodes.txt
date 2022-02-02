@@ -1,0 +1,3 @@
+http://public-rpc.passage.vitwit.com:26657
+https://passage.stakesystems.io:2053
+http://rpc.passage.forbole.com:80

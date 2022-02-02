@@ -11,7 +11,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	regen "github.com/regen-network/regen-ledger/app"
+	passage "github.com/envadiv/Passage3d/app"
 
 	"github.com/tendermint/tendermint/types"
 
@@ -81,7 +81,7 @@ func Process(doc *types.GenesisDoc, accountsCsv io.Reader, communityPoolRegen in
 		return err
 	}
 
-	cdc, _ := regen.MakeCodecs()
+	cdc, _ := passage.MakeCodecs()
 
 	err = setAccounts(cdc, genState, accounts, balances, communityPoolRegen)
 	if err != nil {
@@ -223,11 +223,11 @@ func setAccounts(cdc codec.Marshaler, genesis map[string]json.RawMessage, accoun
 	return nil
 }
 
-func buildDistrMaccAndBalance(regenAmount int) (auth.ModuleAccountI, *bank.Balance, error) {
-	maccPerms := regen.GetMaccPerms()
+func buildDistrMaccAndBalance(passageAmount int) (auth.ModuleAccountI, *bank.Balance, error) {
+	maccPerms := passage.GetMaccPerms()
 	distrMacc := auth.NewEmptyModuleAccount(distribution.ModuleName, maccPerms[distribution.ModuleName]...)
 
-	distrCoins, err := RegenToCoins(NewDecFromInt64(int64(regenAmount)))
+	distrCoins, err := RegenToCoins(NewDecFromInt64(int64(passageAmount)))
 	if err != nil {
 		return nil, nil, err
 	}

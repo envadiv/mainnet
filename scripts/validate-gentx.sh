@@ -1,9 +1,9 @@
 #!/bin/sh
-REGEN_HOME="/tmp/regen$(date +%s)"
-RANDOM_KEY="randomregenvalidatorkey"
-CHAIN_ID=regen-1
-DENOM=uregen
-MAXBOND=50000000000 # 50000REGEN
+PASSAGE_HOME="/tmp/passage$(date +%s)"
+RANDOM_KEY="randompassagevalidatorkey"
+CHAIN_ID=passage-1
+DENOM=upasg
+MAXBOND=50000000000 # 50000PASSAGE
 
 GENTX_FILE=$(find ./$CHAIN_ID/gentxs -iname "*.json")
 LEN_GENTX=$(echo ${#GENTX_FILE})
@@ -48,22 +48,22 @@ else
 
     echo "...........Init Regen.............."
 
-    git clone https://github.com/regen-network/regen-ledger
-    cd regen-ledger
+    git clone https://github.com/envadiv/Passage3d
+    cd passage-ledger
     git checkout v1.0.0-rc1
     make build
-    chmod +x ./build/regen
+    chmod +x ./build/passage
 
-    ./build/regen keys add $RANDOM_KEY --keyring-backend test --home $REGEN_HOME
+    ./build/passage keys add $RANDOM_KEY --keyring-backend test --home $PASSAGE_HOME
 
-    ./build/regen init --chain-id $CHAIN_ID validator --home $REGEN_HOME
+    ./build/passage init --chain-id $CHAIN_ID validator --home $PASSAGE_HOME
 
     echo "..........Fetching genesis......."
-    rm -rf $REGEN_HOME/config/genesis.json
-    curl -s https://raw.githubusercontent.com/regen-network/mainnet/main/$CHAIN_ID/genesis-prelaunch.json >$REGEN_HOME/config/genesis.json
+    rm -rf $PASSAGE_HOME/config/genesis.json
+    curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/$CHAIN_ID/genesis-prelaunch.json >$PASSAGE_HOME/config/genesis.json
 
     # this genesis time is different from original genesis time, just for validating gentx.
-    sed -i '/genesis_time/c\   \"genesis_time\" : \"2021-03-29T00:00:00Z\",' $REGEN_HOME/config/genesis.json
+    sed -i '/genesis_time/c\   \"genesis_time\" : \"2021-03-29T00:00:00Z\",' $PASSAGE_HOME/config/genesis.json
 
     GENACC=$(cat ../$GENTX_FILE | sed -n 's|.*"delegator_address":"\([^"]*\)".*|\1|p')
     denomquery=$(jq -r '.body.messages[0].value.denom' ../$GENTX_FILE)
@@ -86,30 +86,30 @@ else
         exit 1
     fi
 
-    ./build/regen add-genesis-account $RANDOM_KEY 100000000000000$DENOM --home $REGEN_HOME \
+    ./build/passage add-genesis-account $RANDOM_KEY 100000000000000$DENOM --home $PASSAGE_HOME \
         --keyring-backend test
 
-    ./build/regen gentx $RANDOM_KEY 90000000000000$DENOM --home $REGEN_HOME \
+    ./build/passage gentx $RANDOM_KEY 90000000000000$DENOM --home $PASSAGE_HOME \
         --keyring-backend test --chain-id $CHAIN_ID
 
-    cp ../$GENTX_FILE $REGEN_HOME/config/gentx/
+    cp ../$GENTX_FILE $PASSAGE_HOME/config/gentx/
 
     echo "..........Collecting gentxs......."
-    ./build/regen collect-gentxs --home $REGEN_HOME
-    sed -i '/persistent_peers =/c\persistent_peers = ""' $REGEN_HOME/config/config.toml
+    ./build/passage collect-gentxs --home $PASSAGE_HOME
+    sed -i '/persistent_peers =/c\persistent_peers = ""' $PASSAGE_HOME/config/config.toml
 
-    ./build/regen validate-genesis --home $REGEN_HOME
+    ./build/passage validate-genesis --home $PASSAGE_HOME
 
     echo "..........Starting node......."
-    ./build/regen start --home $REGEN_HOME &
+    ./build/passage start --home $PASSAGE_HOME &
 
     sleep 5s
 
     echo "...checking network status.."
 
-    ./build/regen status --node http://localhost:26657
+    ./build/passage status --node http://localhost:26657
 
     echo "...Cleaning the stuff..."
-    killall regen >/dev/null 2>&1
-    rm -rf $REGEN_HOME >/dev/null 2>&1
+    killall passage >/dev/null 2>&1
+    rm -rf $PASSAGE_HOME >/dev/null 2>&1
 fi

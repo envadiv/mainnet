@@ -27,23 +27,23 @@ fi
 source ~/.bashrc
 
 echo "CAUTION!"
-echo "-- If Regen was previously installed, the following step will remove ~/.regen from your system. Are you sure you would like to continue?--"
+echo "-- If Regen was previously installed, the following step will remove ~/.passage from your system. Are you sure you would like to continue?--"
 
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) rm -rf ~/.regen; break;;
+        Yes ) rm -rf ~/.passage; break;;
         No ) exit;;
     esac
 done
 
-DAEMON=regen
-DENOM=uregen
-CHAIN_ID=regen-1
+DAEMON=passage
+DENOM=upasg
+CHAIN_ID=passage-1
 PERSISTENT_PEERS="69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,d35d652b6cb3bf7d6cb8d4bd7c036ea03e7be2ab@116.203.182.185:26656,ffacd3202ded6945fed12fa4fd715b1874985b8c@3.98.38.91:26656"
 
-echo "install regen-ledger"
-git clone https://github.com/regen-network/regen-ledger 
-cd ~/regen-ledger
+echo "install passage-ledger"
+git clone https://github.com/envadiv/Passage3d 
+cd ~/passage-ledger
 git fetch
 git checkout v1.0.0
 make install
@@ -84,7 +84,7 @@ echo ""
 echo "----------Setting up your validator node------------"
 $DAEMON init --chain-id $CHAIN_ID $YOUR_NAME
 echo "------Downloading Regen Mainnet genesis--------"
-curl -s https://raw.githubusercontent.com/regen-network/mainnet/main/regen-1/genesis.json > ~/.regen/config/genesis.json
+curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
 
 echo "----------Setting config for seed node---------"
 sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:26657#g' ~/.$DAEMON/config/config.toml
@@ -103,8 +103,8 @@ make cosmovisor
 cp cosmovisor $GOBIN/cosmovisor
 
 echo "Setting up cosmovisor directories"
-mkdir -p ~/.regen/cosmovisor/genesis/bin
-cp $GOBIN/regen ~/.regen/cosmovisor/genesis/bin
+mkdir -p ~/.passage/cosmovisor/genesis/bin
+cp $GOBIN/passage ~/.passage/cosmovisor/genesis/bin
 
 echo "---------Creating system file---------"
 
@@ -112,7 +112,7 @@ echo "[Unit]
 Description=Cosmovisor daemon
 After=network-online.target
 [Service]
-Environment="DAEMON_NAME=regen"
+Environment="DAEMON_NAME=passage"
 Environment="DAEMON_HOME=${HOME}/.${DAEMON}"
 Environment="DAEMON_RESTART_AFTER_UPGRADE=on"
 User=${USER}
@@ -138,4 +138,4 @@ echo ""
 echo ""
 echo "Next you will need to fund the above wallet address. When finished, you can create your validator by customizing and running the following command"
 echo ""
-echo "regen tx staking create-validator --amount 9000000000uregen --commission-max-change-rate \"0.1\" --commission-max-rate \"0.20\" --commission-rate \"0.1\" --details \"Some details about yourvalidator\" --from <keyname> --pubkey=\"$(regen tendermint show-validator)\" --moniker <your moniker> --min-self-delegation \"1\" --chain-id regen-1 --gas auto --fees 500uregen"
+echo "passage tx staking create-validator --amount 9000000000upasg --commission-max-change-rate \"0.1\" --commission-max-rate \"0.20\" --commission-rate \"0.1\" --details \"Some details about yourvalidator\" --from <keyname> --pubkey=\"$(passage tendermint show-validator)\" --moniker <your moniker> --min-self-delegation \"1\" --chain-id passage-1 --gas auto --fees 500upasg"

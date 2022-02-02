@@ -1,8 +1,8 @@
-all: regen-1
+all: passage-1
 
-.PHONY: regen-1
+.PHONY: passage-1
 
-regen-1:
-	go run . build-genesis regen-1
-	mv -f regen-1/genesis.json regen-1/genesis-prelaunch.json
+passage-1:
+	go run . build-genesis passage-1
+	mv -f passage-1/genesis.json passage-1/genesis-prelaunch.json
 	bash -x ./scripts/gen-genesis.sh

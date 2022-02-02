@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-const communityBootstrappingAddr = "regen1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u"
+const communityBootstrappingAddr = "pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u"
 
 var one = NewDecFromInt64(1)
 
 var airdropDenyList = []string{
-	"regen1fe64cfja86k4rr8e2qrvc499dulfpxt3anuscs",
-	"regen1yz3c47fkm5e2yd4dtxk30sug4ntcxc9ng2cf69",
-	"regen1xgplygxjyzh7ngzc8wal8w40wr6m7qn2sm9mzx",
-	"regen1ma0pk6g6wsxuksgnefsrtgsceqx6x0nksez2ts",
-	"regen1p62d756unkyn83wa9ls8dzmlg3d2u24fz65lt2",
-	"regen1wts9f35khx5r94p3rdwgk3evv0v06ewrfl90th",
-	"regen1xv7pkdjtumtvakyfgwc7daknzxrdk8yhh9kng7",
+	"pasg1fe64cfja86k4rr8e2qrvc499dulfpxt3anuscs",
+	"pasg1yz3c47fkm5e2yd4dtxk30sug4ntcxc9ng2cf69",
+	"pasg1xgplygxjyzh7ngzc8wal8w40wr6m7qn2sm9mzx",
+	"pasg1ma0pk6g6wsxuksgnefsrtgsceqx6x0nksez2ts",
+	"pasg1p62d756unkyn83wa9ls8dzmlg3d2u24fz65lt2",
+	"pasg1wts9f35khx5r94p3rdwgk3evv0v06ewrfl90th",
+	"pasg1xv7pkdjtumtvakyfgwc7daknzxrdk8yhh9kng7",
 }
 
 func AirdropRegenForMinFees(accMap map[string]Account, genesisTime time.Time) error {

@@ -8,7 +8,7 @@ import (
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distribution "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	regen "github.com/regen-network/regen-ledger/app"
+	passage "github.com/envadiv/Passage3d/app"
 
 	"github.com/stretchr/testify/require"
 
@@ -19,7 +19,7 @@ import (
 const testTemplate = `
 {
   "genesis_time": "2021-03-26T16:00:00Z",
-  "chain_id": "regen-prelaunch-1",
+  "chain_id": "passage-prelaunch-1",
   "initial_height": "1",
   "app_hash": "",
   "app_state": {
@@ -31,9 +31,9 @@ const testTemplate = `
 `
 
 const testAccounts = `
-regen1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u,100000,MAINNET,1
-regen1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz,200000.301,2020-06-19,2
-regen1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz,300000.0,MAINNET+1YEAR,2
+pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u,100000,MAINNET,1
+pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz,200000.301,2020-06-19,2
+pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz,300000.0,MAINNET+1YEAR,2
 `
 
 const testCommunityPoolRegenAmount = 100000
@@ -64,7 +64,7 @@ func TestProcess(t *testing.T) {
 	require.Equal(t,
 		`{
   "genesis_time": "2021-03-26T16:00:00Z",
-  "chain_id": "regen-prelaunch-1",
+  "chain_id": "passage-prelaunch-1",
   "initial_height": "1",
   "consensus_params": {
     "block": {
@@ -99,14 +99,14 @@ func TestProcess(t *testing.T) {
           "@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount",
           "base_vesting_account": {
             "base_account": {
-              "address": "regen1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz",
+              "address": "pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz",
               "pub_key": null,
               "account_number": "0",
               "sequence": "0"
             },
             "original_vesting": [
               {
-                "denom": "uregen",
+                "denom": "upasg",
                 "amount": "500001301000"
               }
             ],
@@ -120,7 +120,7 @@ func TestProcess(t *testing.T) {
               "length": "0",
               "amount": [
                 {
-                  "denom": "uregen",
+                  "denom": "upasg",
                   "amount": "200001301000"
                 }
               ]
@@ -129,7 +129,7 @@ func TestProcess(t *testing.T) {
               "length": "31556952",
               "amount": [
                 {
-                  "denom": "uregen",
+                  "denom": "upasg",
                   "amount": "150000000000"
                 }
               ]
@@ -138,7 +138,7 @@ func TestProcess(t *testing.T) {
               "length": "2629746",
               "amount": [
                 {
-                  "denom": "uregen",
+                  "denom": "upasg",
                   "amount": "150000000000"
                 }
               ]
@@ -147,7 +147,7 @@ func TestProcess(t *testing.T) {
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "regen1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u",
+          "address": "pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
@@ -155,7 +155,7 @@ func TestProcess(t *testing.T) {
         {
           "@type": "/cosmos.auth.v1beta1.ModuleAccount",
           "base_account": {
-            "address": "regen1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8ca0qlm",
+            "address": "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8ca0qlm",
             "pub_key": null,
             "account_number": "0",
             "sequence": "0"
@@ -172,28 +172,28 @@ func TestProcess(t *testing.T) {
       },
       "balances": [
         {
-          "address": "regen1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz",
+          "address": "pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz",
           "coins": [
             {
-              "denom": "uregen",
+              "denom": "upasg",
               "amount": "500001301000"
             }
           ]
         },
         {
-          "address": "regen1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u",
+          "address": "pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u",
           "coins": [
             {
-              "denom": "uregen",
+              "denom": "upasg",
               "amount": "99999000000"
             }
           ]
         },
         {
-          "address": "regen1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8ca0qlm",
+          "address": "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8ca0qlm",
           "coins": [
             {
-              "denom": "uregen",
+              "denom": "upasg",
               "amount": "100000000000"
             }
           ]
@@ -201,7 +201,7 @@ func TestProcess(t *testing.T) {
       ],
       "supply": [
         {
-          "denom": "uregen",
+          "denom": "upasg",
           "amount": "700000301000"
         }
       ],
@@ -217,7 +217,7 @@ func TestProcess(t *testing.T) {
       "fee_pool": {
         "community_pool": [
           {
-            "denom": "uregen",
+            "denom": "upasg",
             "amount": "100000000000.000000000000000000"
           }
         ]
@@ -233,11 +233,11 @@ func TestProcess(t *testing.T) {
     }
   }
 }`, json)
-	require.Equal(t, `regen1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz	500001.301	3
+	require.Equal(t, `pasg1lusdjktpk3f2v33cda5uwnya5qcyv04cwvnkwz	500001.301	3
 	200001.3010	MAINNET
 	150000.0	2022-03-26 21:49:12
 	150000	2022-04-26 08:18:18
-regen1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u	99999	1
+pasg1zxcfa9nrjamf5kt3q7ruwh2nscmm7su2temk4u	99999	1
 	99999	MAINNET
 `, auditOut)
 }
@@ -248,7 +248,7 @@ func TestBuildDistrMaccAndBalance(t *testing.T) {
 	testCoins, err := RegenToCoins(NewDecFromInt64(int64(testRegenAmount)))
 	require.NoError(t, err)
 
-	maccPerms := regen.GetMaccPerms()
+	maccPerms := passage.GetMaccPerms()
 	testMacc := auth.NewEmptyModuleAccount(distribution.ModuleName, maccPerms[distribution.ModuleName]...)
 
 	testBalance := &bank.Balance{
