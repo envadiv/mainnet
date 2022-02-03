@@ -1,4 +1,4 @@
-# Regen Network Mainnet
+# Passage3D Blockchain Mainnet Resrouces
 
 ## Resources
 
@@ -8,17 +8,17 @@
 - ### [RPC Nodes](./rpc-nodes.txt)
 - ### [Seed Nodes](./seed-nodes.txt)
 - ### [Persistent Peer Nodes](./peer-nodes.txt)
-- API Swagger Docs: http://public-rpc.passage.vitwit.com:1317/swagger/
+- API Swagger Docs: https://api.passage.vitwit.com/swagger/
 
 ## Node Requirements
 
 ### Minimum hardware requirements
-- 8GB RAM
-- 2 CPUs
-- 200G SSD
+- 16GB RAM
+- 4 CPUs
+- 400G SSD
 - Ubuntu 18.04+ (Recommended)
 
-Note: 2 sentry architecture is the bare minimum setup required.
+Note: 3 sentry architecture is the bare minimum setup required.
 
 ### Software requirements
 
@@ -27,8 +27,8 @@ Note: 2 sentry architecture is the bare minimum setup required.
 ```sh
 sudo apt update
 sudo apt install build-essential jq -y
-wget https://dl.google.com/go/go1.15.6.linux-amd64.tar.gz
-tar -xvf go1.15.6.linux-amd64.tar.gz
+wget https://dl.google.com/go/go1.17.linux-amd64.tar.gz
+tar -xvf go1.17.linux-amd64.tar.gz
 sudo mv go /usr/local
 ```
 
@@ -48,16 +48,16 @@ source ~/.bashrc
 Verify Go installation:
 
 ```sh
-go version # should be go1.15.6
+go version # should be go1.17
 ```
 
 #### Setup Regen Ledger
 
-**Clone the repo and install passage-ledger**
+**Clone the repo and install Passage3D**
 ```sh
-mkdir -p $GOPATH/src/github.com/passage-network
-cd $GOPATH/src/github.com/passage-network
-git clone https://github.com/envadiv/Passage3d && cd passage-ledger
+mkdir -p $GOPATH/src/github.com/envadiv
+cd $GOPATH/src/github.com/envadiv
+git clone https://github.com/envadiv/Passage3D && cd Passage3D
 git fetch
 git checkout v1.0.0
 make install
@@ -73,12 +73,12 @@ it should display the following details:
 name: passage
 server_name: passage
 version: v1.0.0
-commit: 1b7c80ef102d3ae7cc40bba3ceccd97a64dadbfd
+commit: 
 build_tags: netgo,ledger
-go: go version go1.15.6 linux/amd64
+go: go version go1.17 linux/amd64
 ```
 
-## Gentx submission [CLOSED]
+## Gentx submission
 This section applies to the validators who wants to join the genesis.
 
 ### Step-1: Initialize the chain
@@ -88,7 +88,7 @@ passage init --chain-id passage-1 <your_validator_moniker>
 
 ### Step-2: Replace the genesis
 ```sh
-curl -s https://raw.githubusercontent.com/passage-network/mainnet/main/passage-1/genesis-prelaunch.json > $HOME/.passage/config/genesis.json
+curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-1/genesis-prelaunch.json > $HOME/.passage/config/genesis.json
 ```
 ### Step-3: Add/Recover keys
 ```sh
@@ -103,36 +103,38 @@ passage keys add <key_name> --recover
 
 ### Step-4: Create Gentx
 ```sh
-passage gentx <key_name> <amount>  --chain-id passage-1
+passage gentx <key_name> 9000000upasg  --chain-id passage-1
 ```
+
+_Note: other amounts will be discarded_
 
 ex:
 ```sh
-passage gentx validator 1000000000upasg --chain-id passage-1
+passage gentx validator 9000000upasg --chain-id passage-1
 ```
 
-**Note: Make sure to use the amount < available tokens in the genesis. Also max BONDED TOKENS allowed for gentxs are 50000PASSAGE or 50000000000upasg**
+**Note: Make sure to use the amount < available tokens in the genesis. Also max BONDED TOKENS allowed for gentxs are 9PASG or 9000000upasg**
 
 You might be interested to specify other optional flags. For ex:
 
 ```sh
-passage gentx validator 1000000000upasg --chain-id passage-1 \
+passage gentx validator 9000000upasg --chain-id passage-1 \
     --details <the validator details>
-    --identity <The (optional) identity signature (ex. UPort or Keybase)>
-    --commission-rate 0.1 \
+    --identity <The (optional) identity signature (ex. Keybase)>
+    --commission-rate 0.05 \
     --commission-max-rate 0.2 \
     --commission-max-change-rate 0.01
 ```
 
 It will show an output something similar to:
 ```
-Genesis transaction written to "/home/ubuntu/.passage/config/gentx/gentx-9c8fe340885fd0178781eefcf24f32a5e448e15a.json"
+Genesis transaction written to "/home/ubuntu/.passage/config/gentx/gentx-8acdegf2783d0178781eefcf24f32a5e448e15a.json"
 ```
 
 **Note: If you are generating gentx offline on your local machine, append `--pubkey` flag to the above command. You can get pubkey of your validator by running `passage tendermint show-validator`**
 
-### Step-5: Fork passage-network mainnet repo
-- Go to https://github.com/passage-network/mainnet
+### Step-5: Fork envadiv mainnet repo
+- Go to https://github.com/envadiv/mainnet
 - Click on fork and chose your account (if many)
 
 ### Step-6: Clone mainnet repo

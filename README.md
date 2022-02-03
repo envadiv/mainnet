@@ -1,4 +1,6 @@
-# Passage3d Network Mainnet
+# Passage3D Mainnet
+
+This code is inspired from Regen Network's mainnet script
 
 ## Building genesis.json (For admin use)
 

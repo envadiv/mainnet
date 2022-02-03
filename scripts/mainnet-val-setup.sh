@@ -27,7 +27,7 @@ fi
 source ~/.bashrc
 
 echo "CAUTION!"
-echo "-- If Passage3d was previously installed, the following step will remove ~/.passage from your system. Are you sure you would like to continue?--"
+echo "-- If Passage3D was previously installed, the following step will remove ~/.passage from your system. Are you sure you would like to continue?--"
 
 select yn in "Yes" "No"; do
     case $yn in
@@ -39,16 +39,16 @@ done
 DAEMON=passage
 DENOM=upasg
 CHAIN_ID=passage-1
-PERSISTENT_PEERS="69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,d35d652b6cb3bf7d6cb8d4bd7c036ea03e7be2ab@116.203.182.185:26656,ffacd3202ded6945fed12fa4fd715b1874985b8c@3.98.38.91:26656"
+PERSISTENT_PEERS=""
 
-echo "install passage-ledger"
-git clone https://github.com/envadiv/Passage3d 
-cd Passage3d
+echo "install Passage3D"
+git clone https://github.com/envadiv/Passage3D
+cd Passage3D
 git fetch
 git checkout v1.0.0
 make install
 
-echo "Passage3d has been installed successfully!"
+echo "Passage3D has been installed successfully!"
 echo ""
 echo "-- Next we will need to set up your keys and moniker"
 echo "-- Please choose a name for your key --"
@@ -83,7 +83,7 @@ echo ""
 
 echo "----------Setting up your validator node------------"
 $DAEMON init --chain-id $CHAIN_ID $YOUR_NAME
-echo "------Downloading Passage3d Mainnet genesis--------"
+echo "------Downloading Passage3D Mainnet genesis--------"
 curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
 
 echo "----------Setting config for seed node---------"
@@ -97,7 +97,7 @@ echo "Installing cosmovisor - an upgrade manager..."
 rm -rf $GOPATH/src/github.com/cosmos/cosmos-sdk
 git clone https://github.com/cosmos/cosmos-sdk $GOPATH/src/github.com/cosmos/cosmos-sdk
 cd $GOPATH/src/github.com/cosmos/cosmos-sdk
-git checkout v0.40.0
+git checkout v0.45.0
 cd cosmovisor
 make cosmovisor
 cp cosmovisor $GOBIN/cosmovisor

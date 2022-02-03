@@ -48,8 +48,8 @@ else
 
     echo "...........Init Regen.............."
 
-    git clone https://github.com/envadiv/Passage3d
-    cd Passage3d
+    git clone https://github.com/envadiv/Passage3D
+    cd Passage3D
     git checkout v1.0.0-rc1
     make build
     chmod +x ./build/passage
