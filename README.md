@@ -39,9 +39,9 @@ passage init --chain-id passage-1 <my_node_moniker>
     name: passage
     server_name: passage
     version: v1.0.0
-    commit: 1b7c80ef102d3ae7cc40bba3ceccd97a64dadbfd
+    commit: [TBD]
     build_tags: netgo,ledger
-    go: go version go1.15.6 linux/amd64
+    go: go version go1.17 linux/amd64
     ```
 
 - Step-2: Download the mainnet genesis
@@ -60,11 +60,11 @@ passage init --chain-id passage-1 <my_node_moniker>
     Open `~/.passage/config/config.toml` and update `persistent_peers` and `seeds` (comma separated list)
     #### Persistent peers
     ```sh
-    69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,d35d652b6cb3bf7d6cb8d4bd7c036ea03e7be2ab@116.203.182.185:26656,ffacd3202ded6945fed12fa4fd715b1874985b8c@3.98.38.91:26656
+    TBD
     ```
     #### Seeds
     ```sh
-    aebb8431609cb126a977592446f5de252d8b7fa1@104.236.201.138:26656
+    TBD
     ```
 
 - Step-5: Create systemd
@@ -111,8 +111,8 @@ passage tx staking create-validator \
   --pubkey=$(passage tendermint show-validator) \
   --moniker="<your_moniker>" \
   --chain-id=passage-1 \
-  --commission-rate="0.10" \
-  --commission-max-rate="0.20" \
+  --commission-rate="0.05" \
+  --commission-max-rate="0.10" \
   --commission-max-change-rate="0.01" \
   --min-self-delegation="1" \
   --gas="auto" \
