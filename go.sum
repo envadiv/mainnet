@@ -247,8 +247,8 @@ github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21/go.mod h1
 github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFPTqq+I=
 github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/edsrzf/mmap-go v1.0.0/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
-github.com/envadiv/Passage3D v1.0.0-rc1.0.20220131101710-543ab8ecab6f h1:UXLbixyZ2IaGe+IOdbaSnxoOOS2+VBV9uDbX7icTQ/w=
-github.com/envadiv/Passage3D v1.0.0-rc1.0.20220131101710-543ab8ecab6f/go.mod h1:eEmmRtZgD6cRxJpLeD8dvuR9IZ561cF4EQ85KdJ74KA=
+github.com/envadiv/Passage3D v1.0.0-rc3.0.20220329082116-50710bf9a762 h1:8Q9Pyd56WarOLleMWqAU3pwZ9sfDgn2vy80br8t3b50=
+github.com/envadiv/Passage3D v1.0.0-rc3.0.20220329082116-50710bf9a762/go.mod h1:eEmmRtZgD6cRxJpLeD8dvuR9IZ561cF4EQ85KdJ74KA=
 github.com/envoyproxy/go-control-plane v0.6.9/go.mod h1:SBwIajubJHhxtWwsL9s8ss4safvEdbitLhGGK48rN6g=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

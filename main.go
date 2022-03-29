@@ -63,6 +63,9 @@ func main() {
 
 	rootCmd.AddCommand(buildGenesisCmd)
 
+	// adding the claim records cmd
+	rootCmd.AddCommand(AddClaimRecords())
+
 	err := rootCmd.Execute()
 	if err != nil {
 		panic(err)
@@ -81,7 +84,7 @@ func Process(doc *types.GenesisDoc, accountsCsv io.Reader, communityPoolPassage3
 		return err
 	}
 
-	cdc := passage.MakeTestEncodingConfig()
+	cdc := passage.MakeEncodingConfig()
 
 	err = setAccounts(cdc.Marshaler, genState, accounts, balances, communityPoolPassage3D)
 	if err != nil {
