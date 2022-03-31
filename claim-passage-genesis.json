@@ -1605,7 +1605,7 @@
         "amount": "10000000000"
       },
       "params": {
-        "airdrop_enabled": false,
+        "airdrop_enabled": true,
         "airdrop_start_time": "2025-01-01T00:00:00Z",
         "duration_until_decay": "3600s",
         "duration_of_decay": "18000s",
