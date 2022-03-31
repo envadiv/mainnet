@@ -1,0 +1,1 @@
+http://rpc.passage.vitwit.com:26657

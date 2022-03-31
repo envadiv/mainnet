@@ -3,16 +3,20 @@ package main
 import (
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	passage "github.com/envadiv/Passage3D/app"
-
-	claimtypes "github.com/envadiv/Passage3D/x/claim/types"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/types"
+
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
+	passage "github.com/envadiv/Passage3D/app"
+	claimtypes "github.com/envadiv/Passage3D/x/claim/types"
 )
 
 type ClaimAccountRecord struct {
@@ -100,11 +104,19 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 
 	cdc := passage.MakeEncodingConfig()
 
+	var authGenesis authtypes.GenesisState
+	err = cdc.Marshaler.UnmarshalJSON(genState[authtypes.ModuleName], &authGenesis)
+	if err != nil {
+		return err
+	}
+
 	claimRecords := make([]claimtypes.ClaimRecord, len(claimAccountRecords))
+	baseAccounts := make([]*codectypes.Any, len(claimAccountRecords))
 	totalActions := len(claimtypes.Action_name)
 
 	claimModuleAccountBalance := sdk.NewCoin("upasg", sdk.NewInt(0))
 
+	accountIndex := len(authGenesis.Accounts)
 	for index, record := range claimAccountRecords {
 		var claimRecord claimtypes.ClaimRecord
 
@@ -123,6 +135,15 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 		claimRecord.ClaimableAmount = append(claimRecord.ClaimableAmount, sdk.NewCoin("upasg", sdk.NewInt(a)))
 
 		claimRecords[index] = claimRecord
+
+		var baseAccount authtypes.BaseAccount
+		baseAccount.Address = record.Address
+		baseAccount.AccountNumber = uint64(accountIndex)
+		anyValue, err := codectypes.NewAnyWithValue(&baseAccount)
+		if err != nil {
+			return err
+		}
+		baseAccounts[index] = anyValue
 	}
 
 	var claimGenesis claimtypes.GenesisState
@@ -131,10 +152,18 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 		return err
 	}
 
+	// adding claim records and claim module account balance to claim Genesis
 	claimGenesis.ClaimRecords = claimRecords
 	claimGenesis.ModuleAccountBalance = claimModuleAccountBalance
+	// adding baseAccount into auth Genesis
+	authGenesis.Accounts = append(authGenesis.Accounts, baseAccounts...)
 
 	genState[claimtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&claimGenesis)
+	if err != nil {
+		return err
+	}
+	genState[authtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&authGenesis)
+	fmt.Println(string(genState[authtypes.ModuleName]))
 	if err != nil {
 		return err
 	}

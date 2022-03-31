@@ -48,13 +48,17 @@ func main() {
 			}
 
 			auditTsv, err := os.OpenFile(filepath.Join(genDir, "account_dump.tsv"), os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+			if err != nil {
+				return err
+			}
 
 			err = Process(doc, accountsCsv, CommunityPoolPassage3DAmount, auditTsv, errorsAsWarnings)
 			if err != nil {
 				return err
 			}
 
-			genFile := filepath.Join(genDir, "genesis.json")
+			genFile := filepath.Join(genDir, "vesting-accounts-genesis.json")
+			doc.ChainID = genDir
 			return doc.SaveAs(genFile)
 		},
 	}
