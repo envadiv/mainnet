@@ -1606,9 +1606,9 @@
       },
       "params": {
         "airdrop_enabled": true,
-        "airdrop_start_time": "2022-01-01T00:00:00Z",
+        "airdrop_start_time": "2022-03-31T10:14:36.389Z",
         "duration_until_decay": "3600s",
-        "duration_of_decay": "18000s",
+        "duration_of_decay": "180000s",
         "claim_denom": "upasg"
       },
       "claim_records": [
