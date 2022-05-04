@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/btcsuite/btcutil/bech32"
 	"github.com/spf13/cobra"
@@ -26,7 +25,7 @@ func AddressConverter() *cobra.Command {
 			if err := AddressConvert(input_file, output_file, prefix); err != nil {
 				return err
 			}
-			_, _ = fmt.Println(fmt.Sprintf("Successfully prefix %s address conversion is done.", prefix))
+			fmt.Println(fmt.Sprintf("Successfully prefix %s address conversion is done.", prefix))
 			return nil
 		},
 	}
@@ -48,8 +47,8 @@ func AddressConvert(input_file, output_file, prefix string) error {
 	var airdropAccountRecords []Passage3DAirdropClaimRecord
 	for _, airdropRecord := range airdropRecords {
 		re := Passage3DAirdropClaimRecord{
-			ClaimAmount:      strconv.Itoa(10 * 10e6),
-			Passage3DAddress: airdropRecord,
+			ClaimAmount:      airdropRecord.AirdropAmount,
+			Passage3DAddress: airdropRecord.NewPrefixAddress,
 		}
 		airdropAccountRecords = append(airdropAccountRecords, re)
 	}
@@ -59,19 +58,15 @@ func AddressConvert(input_file, output_file, prefix string) error {
 }
 
 type AirdropRecord struct {
-	Name             string
-	Passage3DAddress string
-	CosmosAddress    string
+	OldAddress       string
+	NewPrefixAddress string
+	AirdropAmount    string
 }
 
 type Passage3DAirdropClaimRecord struct {
 	Passage3DAddress string
 	ClaimAmount      string
 }
-
-var (
-	Passage3dPrefix = "pasg"
-)
 
 func writeToCsvFile(output_file string, claimRecords []Passage3DAirdropClaimRecord) {
 
@@ -90,20 +85,25 @@ func writeToCsvFile(output_file string, claimRecords []Passage3DAirdropClaimReco
 	csvFile.Close()
 }
 
-func parseRecords(prefix string, records [][]string) ([]string, error) {
-	var airdropAccounts []string
+func parseRecords(prefix string, records [][]string) ([]AirdropRecord, error) {
+	var airdropAccounts []AirdropRecord
 	for _, record := range records {
 		// bech32 decode
-		_, hrf, err := bech32.Decode(record[1])
+		_, hrf, err := bech32.Decode(record[0])
 		if err != nil {
 			return nil, nil
 		}
-		p3dAccAddr, err := bech32.Encode(Passage3dPrefix, hrf)
+		aidropAmount := record[1]
+		newAccAddr, err := bech32.Encode(prefix, hrf)
 		if err != nil {
 			return nil, err
 		}
 		// encode with prefix
-		airdropAccounts = append(airdropAccounts, p3dAccAddr)
+		airdropAccounts = append(airdropAccounts, AirdropRecord{
+			OldAddress:       record[0],
+			NewPrefixAddress: newAccAddr,
+			AirdropAmount:    aidropAmount,
+		})
 	}
 	return airdropAccounts, nil
 }
