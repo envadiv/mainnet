@@ -3,6 +3,7 @@ module github.com/envadiv/mainnet
 go 1.15
 
 require (
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cockroachdb/apd/v2 v2.0.2
 	github.com/cosmos/cosmos-sdk v0.45.0
 	github.com/envadiv/Passage3D v1.0.0-rc3.0.20220329082116-50710bf9a762

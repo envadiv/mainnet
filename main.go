@@ -66,9 +66,10 @@ func main() {
 	buildGenesisCmd.Flags().BoolVar(&errorsAsWarnings, "errors-as-warnings", false, "Allows records with errors to be ignored with a warning rather than failing")
 
 	rootCmd.AddCommand(buildGenesisCmd)
-
 	// adding the claim records cmd
 	rootCmd.AddCommand(AddClaimRecords())
+	// address converter
+	rootCmd.AddCommand(AddressConverter())
 
 	err := rootCmd.Execute()
 	if err != nil {

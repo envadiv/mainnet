@@ -1,6 +1,11 @@
 # Passage3D Mainnet
 
 This code is inspired from Regen Network's mainnet script
+## Address converter 
+Execute:
+```shell
+go run . addr-converter input.csv output_address.csv pasg 
+```
 
 ## Building genesis.json (For admin use)
 
