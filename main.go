@@ -10,11 +10,8 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	passage "github.com/envadiv/Passage3D/app"
-
 	"github.com/tendermint/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -131,10 +128,10 @@ func buildAccounts(accountsCsv io.Reader, genesisTime time.Time, auditOutput io.
 		return nil, nil, fmt.Errorf("error on MergeAccounts: %w", err)
 	}
 
-	err = AirdropPassage3DForMinFees(accMap, genesisTime)
-	if err != nil {
-		return nil, nil, err
-	}
+	// err = AirdropPassage3DForMinFees(accMap, genesisTime)
+	// if err != nil {
+	// 	return nil, nil, err
+	// }
 
 	accounts = SortAccounts(accMap)
 	PrintAccountAudit(accounts, genesisTime, auditOutput)
