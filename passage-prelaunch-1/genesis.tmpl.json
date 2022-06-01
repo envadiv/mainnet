@@ -54,9 +54,9 @@
         "amount": "86000000000000"
       },
       "params": {
-        "airdrop_enabled": false,
-        "airdrop_start_time": "2025-01-01T00:00:00Z",
-        "duration_until_decay": "3600s",
+        "airdrop_enabled": true,
+        "airdrop_start_time": "2022-05-31T15:00:00Z",
+        "duration_until_decay": "2592000s",
         "duration_of_decay": "18000s",
         "claim_denom": "upasg"
       },
