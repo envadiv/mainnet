@@ -10,11 +10,8 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	passage "github.com/envadiv/Passage3D/app"
-
 	"github.com/tendermint/tendermint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -48,13 +45,17 @@ func main() {
 			}
 
 			auditTsv, err := os.OpenFile(filepath.Join(genDir, "account_dump.tsv"), os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+			if err != nil {
+				return err
+			}
 
 			err = Process(doc, accountsCsv, CommunityPoolPassage3DAmount, auditTsv, errorsAsWarnings)
 			if err != nil {
 				return err
 			}
 
-			genFile := filepath.Join(genDir, "genesis.json")
+			genFile := filepath.Join(genDir, "vesting-accounts-genesis.json")
+			doc.ChainID = genDir
 			return doc.SaveAs(genFile)
 		},
 	}
@@ -62,6 +63,10 @@ func main() {
 	buildGenesisCmd.Flags().BoolVar(&errorsAsWarnings, "errors-as-warnings", false, "Allows records with errors to be ignored with a warning rather than failing")
 
 	rootCmd.AddCommand(buildGenesisCmd)
+	// adding the claim records cmd
+	rootCmd.AddCommand(AddClaimRecords())
+	// address converter
+	rootCmd.AddCommand(AddressConverter())
 
 	err := rootCmd.Execute()
 	if err != nil {
@@ -81,7 +86,7 @@ func Process(doc *types.GenesisDoc, accountsCsv io.Reader, communityPoolPassage3
 		return err
 	}
 
-	cdc := passage.MakeTestEncodingConfig()
+	cdc := passage.MakeEncodingConfig()
 
 	err = setAccounts(cdc.Marshaler, genState, accounts, balances, communityPoolPassage3D)
 	if err != nil {
@@ -124,10 +129,10 @@ func buildAccounts(accountsCsv io.Reader, genesisTime time.Time, auditOutput io.
 		return nil, nil, fmt.Errorf("error on MergeAccounts: %w", err)
 	}
 
-	err = AirdropPassage3DForMinFees(accMap, genesisTime)
-	if err != nil {
-		return nil, nil, err
-	}
+	// err = AirdropPassage3DForMinFees(accMap, genesisTime)
+	// if err != nil {
+	// 	return nil, nil, err
+	// }
 
 	accounts = SortAccounts(accMap)
 	PrintAccountAudit(accounts, genesisTime, auditOutput)
