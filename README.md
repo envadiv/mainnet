@@ -1,13 +1,26 @@
 # Passage3D Mainnet
 
 This code is inspired from Regen Network's mainnet script
-## Address converter 
+
+## Build genesis (For admin use)
+### Address converter
 Execute:
 ```shell
 go run . addr-converter input.csv output_address.csv pasg 
 ```
 
-## Building genesis.json (For admin use)
+### Add claim records/airdrop accounts
+Execute:
+```shell
+go run . add-claim-records genesis.json claim-records.csv
+```
+
+Note: This will create a new genesis file from the input (`claim-passage-genesis.json`). Move to the network if you think it's final.
+```shell
+mv claim-passage-genesis.json <chain-id>/genesis.json
+```
+
+### Building the final genesis.json
 
 Execute:
 ```shell
