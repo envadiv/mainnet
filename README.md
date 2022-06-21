@@ -9,18 +9,7 @@ Execute:
 go run . addr-converter input.csv output_address.csv pasg 
 ```
 
-### Add claim records/airdrop accounts
-Execute:
-```shell
-go run . add-claim-records genesis.json claim-records.csv
-```
-
-Note: This will create a new genesis file from the input (`claim-passage-genesis.json`). Move to the network if you think it's final.
-```shell
-mv claim-passage-genesis.json <chain-id>/genesis.json
-```
-
-### Building the final genesis.json
+### Building the `genesis.json` aka add all vesting, genesis accounts and balances
 
 Execute:
 ```shell
@@ -31,6 +20,17 @@ For pre-launch, we can ignore errors:
 
 ```shell
 go run . build-genesis passage-prelaunch-1 --errors-as-warnings
+```
+
+### Add claim records/airdrop accounts
+Execute:
+```shell
+go run . add-claim-records genesis.json claim-records.csv
+```
+
+Note: This will create a new genesis file from the input (`claim-passage-genesis.json`). Move to the network if you think it's final.
+```shell
+mv claim-passage-genesis.json <chain-id>/genesis.json
 ```
 
 ## Join as a validator
