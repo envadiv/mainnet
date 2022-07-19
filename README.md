@@ -37,7 +37,7 @@ mv claim-passage-genesis.json <chain-id>/genesis.json
 
 ### Requirements
 
-Check out these [instructions](./passage-1/README.md##node-requirements) for installing `passage@v1.0.0`
+Check out these [instructions](./passage-1/README.md#node-requirements) for installing `passage@v1.0.0`
 
 If you haven't initialized your node, init passage chain by running
 
