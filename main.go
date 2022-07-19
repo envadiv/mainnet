@@ -9,15 +9,15 @@ import (
 	"path/filepath"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	passage "github.com/envadiv/Passage3D/app"
-	"github.com/tendermint/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distribution "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	passage "github.com/envadiv/Passage3D/app"
 	"github.com/spf13/cobra"
+	"github.com/tendermint/tendermint/types"
 )
 
 const CommunityPoolPassage3DAmount = 2_000_000
@@ -190,21 +190,37 @@ func setAccounts(cdc codec.Codec, genesis map[string]json.RawMessage, accounts [
 	bankGenesis.Supply = supply
 
 	genesis[bank.ModuleName], err = cdc.MarshalJSON(&bankGenesis)
+	if err != nil {
+		return err
+	}
 
 	var authGenesis auth.GenesisState
-
 	err = cdc.UnmarshalJSON(genesis[auth.ModuleName], &authGenesis)
 	if err != nil {
 		return err
 	}
 
-	for _, acc := range accounts {
-		any, err := cdctypes.NewAnyWithValue(acc)
+	existsAccs := make(map[string]bool)
+	for _, genAcc := range authGenesis.Accounts {
+		var acc auth.AccountI
+		err := cdc.UnpackAny(genAcc, &acc)
 		if err != nil {
 			return err
 		}
+		existsAccs[acc.GetAddress().String()] = true
+	}
 
-		authGenesis.Accounts = append(authGenesis.Accounts, any)
+	for _, acc := range accounts {
+		addr := acc.GetAddress().String()
+		// if account does not exists we are appending to genesis accounts
+		if _, ok := existsAccs[addr]; !ok {
+			any, err := cdctypes.NewAnyWithValue(acc)
+			if err != nil {
+				return err
+			}
+			authGenesis.Accounts = append(authGenesis.Accounts, any)
+			existsAccs[addr] = true
+		}
 	}
 
 	distrMaccAny, err := cdctypes.NewAnyWithValue(distrMacc)
@@ -214,6 +230,9 @@ func setAccounts(cdc codec.Codec, genesis map[string]json.RawMessage, accounts [
 	authGenesis.Accounts = append(authGenesis.Accounts, distrMaccAny)
 
 	genesis[auth.ModuleName], err = cdc.MarshalJSON(&authGenesis)
+	if err != nil {
+		return err
+	}
 
 	var distrGenesis distribution.GenesisState
 	err = cdc.UnmarshalJSON(genesis[distribution.ModuleName], &distrGenesis)
@@ -224,6 +243,9 @@ func setAccounts(cdc codec.Codec, genesis map[string]json.RawMessage, accounts [
 	// set CommunityPool to balance of distribution module account
 	distrGenesis.FeePool.CommunityPool = sdk.NewDecCoinsFromCoins(distrBalance.Coins...)
 	genesis[distribution.ModuleName], err = cdc.MarshalJSON(&distrGenesis)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
