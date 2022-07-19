@@ -54,10 +54,10 @@
         "amount": "86000000000000"
       },
       "params": {
-        "airdrop_enabled": true,
-        "airdrop_start_time": "2022-05-31T15:00:00Z",
+        "airdrop_enabled": false,
+        "airdrop_start_time": "2022-12-31T15:00:00Z",
         "duration_until_decay": "2592000s",
-        "duration_of_decay": "18000s",
+        "duration_of_decay": "15552000s",
         "claim_denom": "upasg"
       },
       "claim_records": []
@@ -154,15 +154,15 @@
     },
     "mint": {
       "minter": {
-        "inflation": "0.500000000000000000",
+        "inflation": "0.000000000000000000",
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
         "mint_denom": "upasg",
-        "inflation_rate_change": "0.450000000000000000",
-        "inflation_max": "0.550000000000000000",
-        "inflation_min": "0.450000000000000000",
-        "goal_bonded": "0.70000000000000000",
+        "inflation_rate_change": "0.000000000000000000",
+        "inflation_max": "0.000000000000000000",
+        "inflation_min": "0.000000000000000000",
+        "goal_bonded": "0.80000000000000000",
         "blocks_per_year": "6311520"
       }
     },

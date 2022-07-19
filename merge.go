@@ -10,9 +10,9 @@ func MergeAccounts(accounts []Account) (map[string]Account, error) {
 	accMap := make(map[string]Account)
 
 	for _, acc := range accounts {
-		if len(acc.Distributions) == 0 {
-			return nil, fmt.Errorf("account must have atleast one distribution: %v", acc)
-		}
+		// if len(acc.Distributions) == 0 {
+		// 	return nil, fmt.Errorf("account must have atleast one distribution: %v", acc)
+		// }
 		addrStr := acc.Address.String()
 		existing, ok := accMap[addrStr]
 		var newAcc Account
@@ -25,7 +25,7 @@ func MergeAccounts(accounts []Account) (map[string]Account, error) {
 
 			err = newAcc.Validate()
 			if err != nil {
-				return nil, fmt.Errorf("error merging two accounts: %w", err)
+				return nil, fmt.Errorf("error merging two accounts: %w, %s", err, acc.Address.String())
 			}
 		} else {
 			newAcc = acc
@@ -40,6 +40,8 @@ func mergeTwoAccounts(acc1, acc2 Account) (Account, error) {
 	if !acc1.Address.Equals(acc2.Address) {
 		return Account{}, fmt.Errorf("%s != %s", acc1.Address, acc2.Address)
 	}
+
+	fmt.Println("Merging two", acc1, acc2)
 
 	newTotal, err := acc1.TotalPassage.Add(acc2.TotalPassage)
 	if err != nil {

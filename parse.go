@@ -77,6 +77,7 @@ func ParseAccountsCsv(rdr io.Reader, genesisTime time.Time, errorsAsWarnings boo
 func parseLine(line []string, genesisTime time.Time) (Record, error) {
 	addr, err := sdk.GetFromBech32(line[0], app.Bech32PrefixAccAddr)
 	if err != nil {
+		fmt.Println("bech32 error", line[0])
 		return Record{}, err
 	}
 
@@ -89,7 +90,6 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 	startTimeStr := strings.TrimSpace(line[2])
 	switch startTimeStr {
 	case "0":
-		startTime = genesisTime
 	case "MAINNET+1YEAR":
 		startTime = genesisTime.Add(OneYear)
 	default:
@@ -98,7 +98,14 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 			return Record{}, err
 		}
 
-		startTime = genesisTime.Add(OneWeek * numWeeks)
+		fmt.Println("numWeeks", numWeeks)
+
+		weeksInSeconds, err := time.ParseDuration(fmt.Sprintf("%ds", SecondsPerWeek*numWeeks))
+		if err != nil {
+			return Record{}, err
+		}
+
+		startTime = genesisTime.Add(weeksInSeconds)
 	}
 
 	numDist, err := strconv.Atoi(line[3])
@@ -106,9 +113,9 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 		return Record{}, err
 	}
 
-	if numDist < 1 {
-		return Record{}, fmt.Errorf("expected a positive integer, got %d", numDist)
-	}
+	// if numDist < 1 {
+	// 	return Record{}, fmt.Errorf("expected a positive integer, got %d", numDist)
+	// }
 
 	return Record{
 		Address:                 addr,
