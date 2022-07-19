@@ -111,12 +111,21 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 	}
 
 	claimRecords := make([]claimtypes.ClaimRecord, len(claimAccountRecords))
-	baseAccounts := make([]*codectypes.Any, len(claimAccountRecords))
+	var baseAccounts []*codectypes.Any
 	totalActions := len(claimtypes.Action_name)
 
 	claimModuleAccountBalance := sdk.NewCoin("upasg", sdk.NewInt(0))
 
-	accountIndex := len(authGenesis.Accounts)
+	existsAccs := make(map[string]bool)
+	for _, genAcc := range authGenesis.Accounts {
+		var acc authtypes.AccountI
+		err := cdc.Marshaler.UnpackAny(genAcc, &acc)
+		if err != nil {
+			return err
+		}
+		existsAccs[acc.GetAddress().String()] = true
+	}
+
 	for index, record := range claimAccountRecords {
 		var claimRecord claimtypes.ClaimRecord
 
@@ -136,14 +145,19 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 
 		claimRecords[index] = claimRecord
 
+		// if account already exists in genesis accounts we are skiping the new account insertion with addr
+		if _, ok := existsAccs[record.Address]; ok {
+			continue
+		}
+
 		var baseAccount authtypes.BaseAccount
 		baseAccount.Address = record.Address
-		baseAccount.AccountNumber = uint64(accountIndex)
+		baseAccount.AccountNumber = 0
 		anyValue, err := codectypes.NewAnyWithValue(&baseAccount)
 		if err != nil {
 			return err
 		}
-		baseAccounts[index] = anyValue
+		baseAccounts = append(baseAccounts, anyValue)
 	}
 
 	var claimGenesis claimtypes.GenesisState
