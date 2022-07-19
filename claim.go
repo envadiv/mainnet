@@ -111,7 +111,7 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 	}
 
 	claimRecords := make([]claimtypes.ClaimRecord, len(claimAccountRecords))
-	baseAccounts := make([]*codectypes.Any, len(claimAccountRecords))
+	var baseAccounts []*codectypes.Any
 	totalActions := len(claimtypes.Action_name)
 
 	claimModuleAccountBalance := sdk.NewCoin("upasg", sdk.NewInt(0))
@@ -157,7 +157,7 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 		if err != nil {
 			return err
 		}
-		baseAccounts[index] = anyValue
+		baseAccounts = append(baseAccounts, anyValue)
 	}
 
 	var claimGenesis claimtypes.GenesisState
