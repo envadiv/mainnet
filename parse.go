@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/envadiv/Passage3D/app"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -89,15 +88,17 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 	var startTime time.Time
 	startTimeStr := strings.TrimSpace(line[2])
 	switch startTimeStr {
-	case "MAINNET":
+	case "0":
 		startTime = genesisTime
 	case "MAINNET+1YEAR":
 		startTime = genesisTime.Add(OneYear)
 	default:
-		startTime, err = time.Parse("2006-01-02", line[2])
+		numWeeks, err := strconv.Atoi(startTimeStr)
 		if err != nil {
 			return Record{}, err
 		}
+
+		startTime = genesisTime.Add(OneWeek * numWeeks)
 	}
 
 	numDist, err := strconv.Atoi(line[3])

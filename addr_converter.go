@@ -22,6 +22,9 @@ func AddressConverter() *cobra.Command {
 			input_file := args[0]
 			output_file := args[1]
 			prefix := args[2]
+
+			fmt.Println(input_file, output_file, prefix)
+
 			if err := AddressConvert(input_file, output_file, prefix); err != nil {
 				return err
 			}
@@ -87,11 +90,12 @@ func writeToCsvFile(output_file string, claimRecords []Passage3DAirdropClaimReco
 
 func parseRecords(prefix string, records [][]string) ([]AirdropRecord, error) {
 	var airdropAccounts []AirdropRecord
+	var count = 0
 	for _, record := range records {
 		// bech32 decode
 		_, hrf, err := bech32.Decode(record[0])
 		if err != nil {
-			return nil, nil
+			return nil, err
 		}
 		aidropAmount := record[1]
 		newAccAddr, err := bech32.Encode(prefix, hrf)
@@ -104,6 +108,10 @@ func parseRecords(prefix string, records [][]string) ([]AirdropRecord, error) {
 			NewPrefixAddress: newAccAddr,
 			AirdropAmount:    aidropAmount,
 		})
+
+		count++
 	}
+
+	fmt.Println("total converted", count)
 	return airdropAccounts, nil
 }
