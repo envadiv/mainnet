@@ -171,7 +171,7 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 	// adding baseAccount into auth Genesis
 	authGenesis.Accounts = append(authGenesis.Accounts, baseAccounts...)
 
-	fmt.Println("all accounts %s", len(authGenesis.Accounts))
+	fmt.Println("all accounts %d", len(authGenesis.Accounts))
 
 	genState[claimtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&claimGenesis)
 	if err != nil {
