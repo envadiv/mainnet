@@ -57,7 +57,7 @@ passage init --chain-id passage-1 <my_node_moniker>
     name: passage
     server_name: passage
     version: v1.0.0
-    commit: [TBD]
+    commit: 6ae7171e42f24203dc11369e7aef6d590bd09a47
     build_tags: netgo,ledger
     go: go version go1.17 linux/amd64
     ```
