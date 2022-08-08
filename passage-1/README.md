@@ -73,7 +73,7 @@ it should display the following details:
 name: passage
 server_name: passage
 version: v1.0.0
-commit: 
+commit: 6ae7171e42f24203dc11369e7aef6d590bd09a47
 build_tags: netgo,ledger
 go: go version go1.17 linux/amd64
 ```
@@ -90,7 +90,8 @@ passage init --chain-id passage-1 <your_validator_moniker>
 ```sh
 curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-1/genesis-prelaunch.json > $HOME/.passage/config/genesis.json
 ```
-### Step-3: Add/Recover keys
+
+### Step-3: Add/Recover keys (Optional)
 ```sh
 passage keys add <new_key>
 ```
@@ -119,7 +120,7 @@ You might be interested to specify other optional flags. For ex:
 
 ```sh
 passage gentx validator 9000000upasg --chain-id passage-1 \
-    --details <the validator details>
+    --details <your validator details>
     --identity <The (optional) identity signature (ex. Keybase)>
     --commission-rate 0.05 \
     --commission-max-rate 0.2 \
@@ -135,7 +136,7 @@ Genesis transaction written to "/home/ubuntu/.passage/config/gentx/gentx-8acdegf
 
 ### Step-5: Fork envadiv mainnet repo
 - Go to https://github.com/envadiv/mainnet
-- Click on fork and chose your account (if many)
+- Click on `fork` on the top right section of the page.
 
 ### Step-6: Clone mainnet repo
 ```sh
