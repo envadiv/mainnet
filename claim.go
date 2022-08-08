@@ -10,11 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/types"
-
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
 	passage "github.com/envadiv/Passage3D/app"
 	claimtypes "github.com/envadiv/Passage3D/x/claim/types"
 )
@@ -111,12 +109,21 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 	}
 
 	claimRecords := make([]claimtypes.ClaimRecord, len(claimAccountRecords))
-	baseAccounts := make([]*codectypes.Any, len(claimAccountRecords))
+	var baseAccounts []*codectypes.Any
 	totalActions := len(claimtypes.Action_name)
 
 	claimModuleAccountBalance := sdk.NewCoin("upasg", sdk.NewInt(0))
 
-	accountIndex := len(authGenesis.Accounts)
+	existsAccs := make(map[string]bool)
+	for _, genAcc := range authGenesis.Accounts {
+		var acc authtypes.AccountI
+		err := cdc.Marshaler.UnpackAny(genAcc, &acc)
+		if err != nil {
+			return err
+		}
+		existsAccs[acc.GetAddress().String()] = true
+	}
+
 	for index, record := range claimAccountRecords {
 		var claimRecord claimtypes.ClaimRecord
 
@@ -136,14 +143,20 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 
 		claimRecords[index] = claimRecord
 
+		// if account already exists in genesis accounts we are skiping the new account insertion with addr
+		if _, ok := existsAccs[record.Address]; ok {
+			fmt.Println("duplicate", record.Address)
+			continue
+		}
+
 		var baseAccount authtypes.BaseAccount
 		baseAccount.Address = record.Address
-		baseAccount.AccountNumber = uint64(accountIndex)
+		baseAccount.AccountNumber = 0
 		anyValue, err := codectypes.NewAnyWithValue(&baseAccount)
 		if err != nil {
 			return err
 		}
-		baseAccounts[index] = anyValue
+		baseAccounts = append(baseAccounts, anyValue)
 	}
 
 	var claimGenesis claimtypes.GenesisState
@@ -158,12 +171,14 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 	// adding baseAccount into auth Genesis
 	authGenesis.Accounts = append(authGenesis.Accounts, baseAccounts...)
 
+	fmt.Println("all accounts %s", len(authGenesis.Accounts))
+
 	genState[claimtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&claimGenesis)
 	if err != nil {
 		return err
 	}
+
 	genState[authtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&authGenesis)
-	fmt.Println(string(genState[authtypes.ModuleName]))
 	if err != nil {
 		return err
 	}
