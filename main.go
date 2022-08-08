@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const CommunityPoolPassage3DAmount = 2_000_000
+const CommunityPoolPassage3DAmount = 59_750_485
 
 func main() {
 	rootCmd := &cobra.Command{}

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/envadiv/Passage3D/app"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -78,6 +77,7 @@ func ParseAccountsCsv(rdr io.Reader, genesisTime time.Time, errorsAsWarnings boo
 func parseLine(line []string, genesisTime time.Time) (Record, error) {
 	addr, err := sdk.GetFromBech32(line[0], app.Bech32PrefixAccAddr)
 	if err != nil {
+		fmt.Println("bech32 error", line[0])
 		return Record{}, err
 	}
 
@@ -89,15 +89,23 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 	var startTime time.Time
 	startTimeStr := strings.TrimSpace(line[2])
 	switch startTimeStr {
-	case "MAINNET":
-		startTime = genesisTime
+	case "0":
 	case "MAINNET+1YEAR":
 		startTime = genesisTime.Add(OneYear)
 	default:
-		startTime, err = time.Parse("2006-01-02", line[2])
+		numWeeks, err := strconv.Atoi(startTimeStr)
 		if err != nil {
 			return Record{}, err
 		}
+
+		fmt.Println("numWeeks", numWeeks)
+
+		weeksInSeconds, err := time.ParseDuration(fmt.Sprintf("%ds", SecondsPerWeek*numWeeks))
+		if err != nil {
+			return Record{}, err
+		}
+
+		startTime = genesisTime.Add(weeksInSeconds)
 	}
 
 	numDist, err := strconv.Atoi(line[3])
@@ -105,9 +113,9 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 		return Record{}, err
 	}
 
-	if numDist < 1 {
-		return Record{}, fmt.Errorf("expected a positive integer, got %d", numDist)
-	}
+	// if numDist < 1 {
+	// 	return Record{}, fmt.Errorf("expected a positive integer, got %d", numDist)
+	// }
 
 	return Record{
 		Address:                 addr,

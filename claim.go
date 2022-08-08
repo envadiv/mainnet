@@ -10,11 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/types"
-
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
 	passage "github.com/envadiv/Passage3D/app"
 	claimtypes "github.com/envadiv/Passage3D/x/claim/types"
 )
@@ -147,6 +145,7 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 
 		// if account already exists in genesis accounts we are skiping the new account insertion with addr
 		if _, ok := existsAccs[record.Address]; ok {
+			fmt.Println("duplicate", record.Address)
 			continue
 		}
 
@@ -172,12 +171,14 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 	// adding baseAccount into auth Genesis
 	authGenesis.Accounts = append(authGenesis.Accounts, baseAccounts...)
 
+	fmt.Println("all accounts %s", len(authGenesis.Accounts))
+
 	genState[claimtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&claimGenesis)
 	if err != nil {
 		return err
 	}
+
 	genState[authtypes.ModuleName], err = cdc.Marshaler.MarshalJSON(&authGenesis)
-	fmt.Println(string(genState[authtypes.ModuleName]))
 	if err != nil {
 		return err
 	}

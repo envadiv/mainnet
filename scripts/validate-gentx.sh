@@ -3,18 +3,18 @@ PASSAGE_HOME="/tmp/passage$(date +%s)"
 RANDOM_KEY="randompassagevalidatorkey"
 CHAIN_ID=passage-1
 DENOM=upasg
-MAXBOND=50000000000 # 50000PASSAGE
+MAXBOND=10000000 # 10PASG
 
 GENTX_FILE=$(find ./$CHAIN_ID/gentxs -iname "*.json")
 LEN_GENTX=$(echo ${#GENTX_FILE})
 
 # Gentx Start date
-start="2021-03-31 15:00:00Z"
+start="2021-08-07 15:00:00Z"
 # Compute the seconds since epoch for start date
 stTime=$(date --date="$start" +%s)
 
 # Gentx End date
-end="2021-04-06 15:00:00Z"
+end="2021-08-15 15:00:00Z"
 # Compute the seconds since epoch for end date
 endTime=$(date --date="$end" +%s)
 
@@ -25,7 +25,7 @@ curTime=$(date --date="$current" +%s)
 
 if [[ $curTime < $stTime ]]; then
     echo "start=$stTime:curent=$curTime:endTime=$endTime"
-    echo "Gentx submission is not open yet. Please close the PR and raise a new PR after 31-March-2021 15:00:00"
+    echo "Gentx submission is not open yet. Please close the PR and raise a new PR after 08-August-2022 15:00:00 UTC"
     exit 0
 else
     if [[ $curTime > $endTime ]]; then
@@ -46,11 +46,11 @@ else
     echo "GentxFile::::"
     echo $GENTX_FILE
 
-    echo "...........Init Regen.............."
+    echo "...........Init Passage.............."
 
     git clone https://github.com/envadiv/Passage3D
     cd Passage3D
-    git checkout v1.0.0-rc1
+    git checkout v1.0.0
     make build
     chmod +x ./build/passage
 
@@ -63,7 +63,7 @@ else
     curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/$CHAIN_ID/genesis-prelaunch.json >$PASSAGE_HOME/config/genesis.json
 
     # this genesis time is different from original genesis time, just for validating gentx.
-    sed -i '/genesis_time/c\   \"genesis_time\" : \"2021-03-29T00:00:00Z\",' $PASSAGE_HOME/config/genesis.json
+    sed -i '/genesis_time/c\   \"genesis_time\" : \"2021-08-07T00:00:00Z\",' $PASSAGE_HOME/config/genesis.json
 
     GENACC=$(cat ../$GENTX_FILE | sed -n 's|.*"delegator_address":"\([^"]*\)".*|\1|p')
     denomquery=$(jq -r '.body.messages[0].value.denom' ../$GENTX_FILE)

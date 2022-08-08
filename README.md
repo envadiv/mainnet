@@ -37,7 +37,7 @@ mv claim-passage-genesis.json <chain-id>/genesis.json
 
 ### Requirements
 
-Check out these [instructions](./passage-1/README.md#Requirements) for installing `passage@v1.0.0`
+Check out these [instructions](./passage-1/README.md#node-requirements) for installing `passage@v1.0.0`
 
 If you haven't initialized your node, init passage chain by running
 
@@ -57,7 +57,7 @@ passage init --chain-id passage-1 <my_node_moniker>
     name: passage
     server_name: passage
     version: v1.0.0
-    commit: [TBD]
+    commit: 6ae7171e42f24203dc11369e7aef6d590bd09a47
     build_tags: netgo,ledger
     go: go version go1.17 linux/amd64
     ```

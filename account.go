@@ -41,21 +41,23 @@ func (acc Account) Validate() error {
 		return fmt.Errorf("expected positive balance, got %s", acc.TotalPassage.String())
 	}
 
-	var calcTotal Dec
-	for _, dist := range acc.Distributions {
-		err := dist.Validate()
-		if err != nil {
-			return err
+	if len(acc.Distributions) > 0 {
+		var calcTotal Dec
+		for _, dist := range acc.Distributions {
+			err := dist.Validate()
+			if err != nil {
+				return err
+			}
+
+			calcTotal, err = calcTotal.Add(dist.Passage)
+			if err != nil {
+				return err
+			}
 		}
 
-		calcTotal, err = calcTotal.Add(dist.Passage)
-		if err != nil {
-			return err
+		if !acc.TotalPassage.IsEqual(calcTotal) {
+			return fmt.Errorf("incorrect balance, expected %s, got %s", acc.TotalPassage.String(), calcTotal.String())
 		}
-	}
-
-	if !acc.TotalPassage.IsEqual(calcTotal) {
-		return fmt.Errorf("incorrect balance, expected %s, got %s", acc.TotalPassage.String(), calcTotal.String())
 	}
 
 	return nil
@@ -72,8 +74,14 @@ func RecordToAccount(rec Record, genesisTime time.Time) (Account, error) {
 	amount := rec.TotalAmount
 	distTime := rec.StartTime
 	if distTime.IsZero() {
-		return Account{}, fmt.Errorf("require a non-zero distribution time")
+		fmt.Println("recordToAcc", rec.Address)
+		return Account{
+			Address:       rec.Address,
+			Distributions: nil,
+			TotalPassage:  amount,
+		}, nil
 	}
+
 	numDist := rec.NumWeeklyDistributions
 	if numDist < 1 {
 		return Account{}, fmt.Errorf("numDist must be >= 1, got %d", numDist)
