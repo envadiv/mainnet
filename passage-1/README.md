@@ -51,7 +51,7 @@ Verify Go installation:
 go version # should be go1.17
 ```
 
-#### Setup Regen Ledger
+#### Setup Passage
 
 **Clone the repo and install Passage3D**
 ```sh
