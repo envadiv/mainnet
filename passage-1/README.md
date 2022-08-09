@@ -21,6 +21,7 @@
 Note: 3 sentry architecture is the bare minimum setup required.
 
 ### Software requirements
+- Go >=1.17.x & <=1.18.x
 
 #### Install Golang
 
