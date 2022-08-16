@@ -1,1 +1,2 @@
 https://rpc.passage.vitwit.com
+https://services.staketab.com/passage-rpc
