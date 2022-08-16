@@ -1,4 +1,4 @@
-# Passage3D Blockchain Mainnet Resrouces
+# Passage3D Blockchain Mainnet Resources
 
 ## Resources
 
