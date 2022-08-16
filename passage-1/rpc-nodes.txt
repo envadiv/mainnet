@@ -1,2 +1,1 @@
-http://rpc.passage.vitwit.com:26657
-http://128.199.224.193:26657/
+https://rpc.passage.vitwit.com
