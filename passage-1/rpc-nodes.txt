@@ -1,1 +1,2 @@
 https://rpc.passage.vitwit.com
+http://rpc.passage.blockscope.net:26657
