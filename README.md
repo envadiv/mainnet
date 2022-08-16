@@ -115,7 +115,22 @@ passage init --chain-id passage-1 <my_node_moniker>
     sudo -S systemctl start passage
     ```
 
-That's all! Your node should be up and running now. You can query your node by executing the following command after the genesis time
+That's all! Your node should be up and running now. You can check the logs by running
+```
+journalctl -u passage -f
+```
+
+You would be able to see the following information in the logs:
+```
+......
+5:34PM INF Starting Node service impl=Node
+5:34PM INF Genesis time is in the future. Sleeping until then... genTime=2022-08-17T15:00:00Z
+5:34PM INF Starting pprof server laddr=localhost:6060
+```
+
+
+
+You can query your node by executing the following command after the genesis time
 
 ```sh
 passage status
