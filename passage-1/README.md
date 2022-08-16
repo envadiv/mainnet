@@ -1,4 +1,4 @@
-# Passage3D Blockchain Mainnet Resrouces
+# Passage3D Blockchain Mainnet Resources
 
 ## Resources
 
@@ -21,6 +21,7 @@
 Note: 3 sentry architecture is the bare minimum setup required.
 
 ### Software requirements
+- Go >=1.17.x & <=1.18.x
 
 #### Install Golang
 
