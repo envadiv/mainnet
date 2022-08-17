@@ -1,1 +1,3 @@
-http://rpc.passage.vitwit.com:26657
+https://rpc.passage.vitwit.com
+http://rpc.passage.blockscope.net:26657
+https://services.staketab.com/passage-rpc

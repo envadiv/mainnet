@@ -1,1 +1,2 @@
-
+https://api.passage.vitwit.com
+https://services.staketab.com/passage-api
