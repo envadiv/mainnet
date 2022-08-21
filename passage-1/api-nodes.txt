@@ -1,4 +1,3 @@
 https://api.passage.vitwit.com
 https://services.staketab.com/passage-api
 https://rest-passage.ecostake.com
-https://passageapi.panthea.eu
