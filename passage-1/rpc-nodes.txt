@@ -2,3 +2,4 @@ https://rpc.passage.vitwit.com
 http://rpc.passage.blockscope.net:26657
 https://services.staketab.com/passage-rpc
 https://rpc-passage.ecostake.com
+https://rpc-passage.zenchainlabs.io
