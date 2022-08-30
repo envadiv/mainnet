@@ -4,4 +4,4 @@ https://services.staketab.com/passage-rpc
 https://rpc-passage.ecostake.com
 https://rpc.passage.sgtstake.com
 https://rpc-passage.zenchainlabs.io
-https://passage-rpc.panthea.eu/
+https://passage-rpc.panthea.eu
