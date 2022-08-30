@@ -3,3 +3,4 @@ https://services.staketab.com/passage-api
 https://rest-passage.ecostake.com
 https://api.passage.sgtstake.com
 https://api-passage.zenchainlabs.io
+https://passage-api.panthea.eu/
