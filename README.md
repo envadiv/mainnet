@@ -78,7 +78,7 @@ passage init --chain-id passage-1 <my_node_moniker>
     Open `~/.passage/config/config.toml` and update `persistent_peers` and `seeds` (comma separated list)
     #### Persistent peers
     ```sh
-    69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,d35d652b6cb3bf7d6cb8d4bd7c036ea03e7be2ab@116.203.182.185:26656,ffacd3202ded6945fed12fa4fd715b1874985b8c@3.98.38.91:26656,8e0b0d4f80d0d2853f853fbd6a76390113f07d72@65.108.127.249:26656,0111da7144fd2e8ce0dfe17906ef6fd760325aca@142.132.213.231:26656
+    69975e7afdf731a165e40449fcffc75167a084fc@104.131.169.70:26656,d35d652b6cb3bf7d6cb8d4bd7c036ea03e7be2ab@116.203.182.185:26656,ffacd3202ded6945fed12fa4fd715b1874985b8c@3.98.38.91:26656,8e0b0d4f80d0d2853f853fbd6a76390113f07d72@65.108.127.249:26656,0111da7144fd2e8ce0dfe17906ef6fd760325aca@142.132.213.231:26656,054b90a8dc7b392e4b1d0e3b6d09bcb2c38251cb@passage-peer.panthea.eu:30656
     ```
 
     #### Seeds
