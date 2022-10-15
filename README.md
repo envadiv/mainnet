@@ -86,6 +86,7 @@ passage init --chain-id passage-1 <my_node_moniker>
     aebb8431609cb126a977592446f5de252d8b7fa1@104.236.201.138:26656
     b6beabfb9309330944f44a1686742c2751748b83@5.161.47.163:26656
     7a9a36630523f54c1a0d56fc01e0e153fd11a53d@167.235.24.145:26656
+    ecfd6a2ab8dc2b196080ff6506cd0d1c68f6f8b5@passage-seed.panthea.eu:40656
     ```
 
 - Step-5: Create systemd
