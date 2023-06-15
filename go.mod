@@ -7,6 +7,7 @@ require (
 	github.com/cockroachdb/apd/v2 v2.0.2
 	github.com/cosmos/cosmos-sdk v0.45.5
 	github.com/envadiv/Passage3D v1.0.0-rc4
+	github.com/gogo/protobuf v1.3.3
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	github.com/tendermint/tendermint v0.34.19

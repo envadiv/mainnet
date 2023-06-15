@@ -8,13 +8,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	passage "github.com/envadiv/Passage3D/app"
 	claimtypes "github.com/envadiv/Passage3D/x/claim/types"
+	"github.com/spf13/cobra"
+	"github.com/tendermint/tendermint/types"
 )
 
 type ClaimAccountRecord struct {
@@ -190,4 +190,60 @@ func addClaimRecords(doc *types.GenesisDoc, claimAccountRecords []ClaimAccountRe
 
 	genFile := "claim-passage-genesis.json"
 	return doc.SaveAs(genFile)
+}
+
+func ExportClaimRecords() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "export-claim-records [genesis-file] [claim-records-file]",
+		Long: "Export claim records to  claim_records.csv from genesis.json file",
+		Args: cobra.ExactArgs(2),
+		Example: `
+	go run main.go export-claim-records genesis-file.json claim-records.csv 
+	`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			genesisFilePath := args[0]
+			claimRecordsPath := args[1]
+
+			doc, err := types.GenesisDocFromFile(genesisFilePath)
+			if err != nil {
+				return err
+			}
+
+			var genState map[string]json.RawMessage
+			err = json.Unmarshal(doc.AppState, &genState)
+			if err != nil {
+				return err
+			}
+
+			cdc := passage.MakeEncodingConfig()
+
+			var claimGenesis claimtypes.GenesisState
+			err = cdc.Marshaler.UnmarshalJSON(genState[claimtypes.ModuleName], &claimGenesis)
+			if err != nil {
+				return err
+			}
+
+			file, err := os.Create(claimRecordsPath)
+			if err != nil {
+				return err
+			}
+
+			defer file.Close()
+
+			writer := csv.NewWriter(file)
+			defer writer.Flush()
+
+			for i := 0; i < len(claimGenesis.ClaimRecords); i++ {
+				row := []string{claimGenesis.ClaimRecords[i].Address, claimGenesis.ClaimRecords[i].ClaimableAmount[0].Amount.String()}
+				if err := writer.Write(row); err != nil {
+					return err
+				}
+			}
+
+			fmt.Println("Airdrop claim records CSV file created successfully")
+			return nil
+		},
+	}
+
+	return cmd
 }
