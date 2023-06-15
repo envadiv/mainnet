@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	authztypes "github.com/cosmos/cosmos-sdk/x/authz"
 	feegranttypes "github.com/cosmos/cosmos-sdk/x/feegrant"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -20,14 +22,23 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var removeAccount = map[string]bool{
-	"pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q": true,
+var vpDecreaseValidator1 = "pasgvaloper1xwdc6lvp30s0uesaufxhhxd9p3prhqss8mt38y"
+var vpDecreaseForRemovedAccount1 = sdk.NewDecFromInt(sdk.NewInt(2515753000000))
+
+var vpDecreaseValidator2 = "pasgvaloper10x0s5tzu6203c2zkqy37ar7pcfpdft9aepuahq"
+var vpDecreaseForRemovedAccount2 = sdk.NewDecFromInt(sdk.NewInt(984244960000))
+
+var removeDelegations = map[string][]string{
+	"pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q": {
+		"pasgvaloper1xwdc6lvp30s0uesaufxhhxd9p3prhqss8mt38y",
+		"pasgvaloper10x0s5tzu6203c2zkqy37ar7pcfpdft9aepuahq",
+	},
 }
 
 var deductDelegation = map[string]int64{
-	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": 1160432,
-	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": 1175541,
-	"pasg1l3rh6794pnch3xz5sp7h4dcu0lees4puywjs5f": 1160432,
+	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": 1160432000000,
+	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": 1175541000000,
+	"pasg1l3rh6794pnch3xz5sp7h4dcu0lees4puywjs5f": 1160430000000,
 }
 
 func MigrateRemainingState() *cobra.Command {
@@ -70,22 +81,30 @@ func MigrateRemainingState() *cobra.Command {
 
 			for i := 0; i < len(oldStakeGenesis.Delegations); i++ {
 				delegation := oldStakeGenesis.Delegations[i]
-				if _, ok := removeAccount[delegation.DelegatorAddress]; ok {
-					continue
+				if value, ok := removeDelegations[delegation.DelegatorAddress]; ok {
+					for i := 0; i < len(value); i++ {
+						if delegation.ValidatorAddress == value[i] {
+							continue
+						}
+					}
 				} else if ds, ok := temp[delegation.DelegatorAddress]; ok {
 					result := delegation.Shares.Sub(sdk.NewDecFromInt(sdk.NewInt(ds)))
-					delegations = append(delegations, stakingtypes.Delegation{
-						DelegatorAddress: delegation.DelegatorAddress,
-						ValidatorAddress: delegation.ValidatorAddress,
-						Shares:           result,
-					},
-					)
-					if vpReduction, ok := validatorsMap[delegation.ValidatorAddress]; ok {
-						validatorsMap[delegation.ValidatorAddress] = vpReduction.Add(sdk.NewDecFromInt(sdk.NewInt(ds)))
+					if result.IsPositive() {
+						delegations = append(delegations, stakingtypes.Delegation{
+							DelegatorAddress: delegation.DelegatorAddress,
+							ValidatorAddress: delegation.ValidatorAddress,
+							Shares:           result,
+						},
+						)
+						if vpReduction, ok := validatorsMap[delegation.ValidatorAddress]; ok {
+							validatorsMap[delegation.ValidatorAddress] = vpReduction.Add(sdk.NewDecFromInt(sdk.NewInt(ds)))
+						} else {
+							validatorsMap[delegation.ValidatorAddress] = sdk.NewDecFromInt(sdk.NewInt(ds))
+						}
+						delete(temp, delegation.DelegatorAddress)
 					} else {
-						validatorsMap[delegation.ValidatorAddress] = sdk.NewDecFromInt(sdk.NewInt(ds))
+						delegations = append(delegations, oldStakeGenesis.Delegations[i])
 					}
-					delete(temp, delegation.DelegatorAddress)
 				} else {
 					delegations = append(delegations, oldStakeGenesis.Delegations[i])
 				}
@@ -99,7 +118,40 @@ func MigrateRemainingState() *cobra.Command {
 					validator.DelegatorShares = validator.DelegatorShares.Sub(value)
 				}
 
+				if validator.OperatorAddress == vpDecreaseValidator1 {
+					validator.Tokens = validator.Tokens.Sub(vpDecreaseForRemovedAccount1.RoundInt())
+					validator.DelegatorShares = validator.DelegatorShares.Sub(vpDecreaseForRemovedAccount1)
+				}
+
+				if validator.OperatorAddress == vpDecreaseValidator2 {
+					validator.Tokens = validator.Tokens.Sub(vpDecreaseForRemovedAccount2.RoundInt())
+					validator.DelegatorShares = validator.DelegatorShares.Sub(vpDecreaseForRemovedAccount2)
+
+				}
+
 				validators = append(validators, validator)
+			}
+
+			var lastPowers []stakingtypes.LastValidatorPower
+			for i := 0; i < len(oldStakeGenesis.LastValidatorPowers); i++ {
+				if value, ok := validatorsMap[oldStakeGenesis.LastValidatorPowers[i].Address]; ok {
+					lastPowers = append(lastPowers, stakingtypes.LastValidatorPower{
+						Address: oldStakeGenesis.LastValidatorPowers[i].Address,
+						Power:   oldStakeGenesis.LastValidatorPowers[i].Power - value.TruncateInt64(),
+					})
+				} else if oldStakeGenesis.LastValidatorPowers[i].Address == vpDecreaseValidator1 {
+					lastPowers = append(lastPowers, stakingtypes.LastValidatorPower{
+						Address: oldStakeGenesis.LastValidatorPowers[i].Address,
+						Power:   oldStakeGenesis.LastValidatorPowers[i].Power - vpDecreaseForRemovedAccount1.TruncateInt64(),
+					})
+				} else if oldStakeGenesis.LastValidatorPowers[i].Address == vpDecreaseValidator2 {
+					lastPowers = append(lastPowers, stakingtypes.LastValidatorPower{
+						Address: oldStakeGenesis.LastValidatorPowers[i].Address,
+						Power:   oldStakeGenesis.LastValidatorPowers[i].Power - vpDecreaseForRemovedAccount2.TruncateInt64(),
+					})
+				} else {
+					lastPowers = append(lastPowers, oldStakeGenesis.LastValidatorPowers[i])
+				}
 			}
 
 			newStakeGenesis := stakingtypes.GenesisState{}
@@ -107,7 +159,7 @@ func MigrateRemainingState() *cobra.Command {
 			newStakeGenesis.Validators = validators
 			newStakeGenesis.Exported = oldStakeGenesis.Exported
 			newStakeGenesis.LastTotalPower = oldStakeGenesis.LastTotalPower
-			newStakeGenesis.LastValidatorPowers = oldStakeGenesis.LastValidatorPowers
+			newStakeGenesis.LastValidatorPowers = lastPowers
 			newStakeGenesis.Params = oldStakeGenesis.Params
 			newStakeGenesis.Redelegations = oldStakeGenesis.Redelegations
 			newStakeGenesis.UnbondingDelegations = oldStakeGenesis.UnbondingDelegations
@@ -153,7 +205,7 @@ func MigrateRemainingState() *cobra.Command {
 
 			for i := 0; i < len(distrGenesis.DelegatorStartingInfos); i++ {
 				distr := distrGenesis.DelegatorStartingInfos[i]
-				if _, ok := removeAccount[distr.DelegatorAddress]; ok {
+				if _, ok := removeDelegations[distr.DelegatorAddress]; ok {
 					continue
 				} else if delegation, ok := deductDelegation[distr.DelegatorAddress]; ok {
 					if _, ok := validatorsMap[distr.ValidatorAddress]; ok {
@@ -167,6 +219,7 @@ func MigrateRemainingState() *cobra.Command {
 							},
 						})
 					}
+
 				} else {
 					startingInfoRecords = append(startingInfoRecords, distr)
 				}
@@ -182,11 +235,84 @@ func MigrateRemainingState() *cobra.Command {
 			}
 
 			newGenesisState[distributiontypes.ModuleName] = bz
-			bz, err = tmjson.Marshal(newGenesisState)
+
+			// memoize validators
+			validatorToStatus := make(map[string]stakingtypes.BondStatus)
+			for _, val := range newStakeGenesis.Validators {
+				validatorToStatus[val.OperatorAddress] = val.Status
+			}
+
+			bondedAccountToStake := make(map[string]sdk.Dec)
+			notbondedAccountToStake := make(map[string]sdk.Dec)
+			bondedBalance := sdk.NewInt(0)
+			notBondedBalance := sdk.NewInt(0)
+			for _, delegation := range newStakeGenesis.Delegations {
+				if status, ok := validatorToStatus[delegation.ValidatorAddress]; ok && status == stakingtypes.Bonded {
+					bondedAccountToStake[delegation.DelegatorAddress] = delegation.Shares
+					bondedBalance.Add(delegation.Shares.TruncateInt())
+				} else {
+					notbondedAccountToStake[delegation.DelegatorAddress] = delegation.Shares
+					notBondedBalance.Add(delegation.Shares.TruncateInt())
+				}
+			}
+
+			bankState := oldGenState[banktypes.ModuleName]
+			var bankGenesis banktypes.GenesisState
+			err = cdc.Marshaler.UnmarshalJSON(bankState, &bankGenesis)
 			if err != nil {
 				return err
 			}
 
+			bondedPoolAddress := "pasg1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3krs45g"
+			notBondedPoolAddress := "pasg1tygms3xhhs3yv487phx3dw4a95jn7t7lzrvyzu"
+			for index, balance := range bankGenesis.Balances {
+				if balance.Address == bondedPoolAddress {
+					bankGenesis.Balances[index] = banktypes.Balance{
+						Address: balance.Address,
+						Coins:   sdk.NewCoins(sdk.NewCoin(UPassageDenom, bondedBalance)),
+					}
+				} else if balance.Address == notBondedPoolAddress {
+					bankGenesis.Balances[index] = banktypes.Balance{
+						Address: balance.Address,
+						Coins:   sdk.NewCoins(sdk.NewCoin(UPassageDenom, notBondedBalance)),
+					}
+				} else {
+					remainingAmount := balance.Coins
+					bondedBalance, ok := bondedAccountToStake[balance.Address]
+					if ok {
+						remainingAmount, ok = remainingAmount.SafeSub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, bondedBalance.TruncateInt())))
+						if !ok {
+							fmt.Println(bondedBalance, "  ", balance.Address, "  ", balance.Coins.String(), "  ", remainingAmount)
+							panic("failed to deduct staked amount 1")
+						}
+					}
+
+					notBondedBalance, ok := notbondedAccountToStake[balance.Address]
+					if ok {
+						remainingAmount, ok = balance.Coins.SafeSub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, notBondedBalance.RoundInt())))
+						if !ok {
+							fmt.Println(notBondedBalance, "   ", balance.Address)
+							panic("failed to deduct staked amount 2")
+						}
+
+					}
+					bankGenesis.Balances[index] = banktypes.Balance{
+						Address: balance.Address,
+						Coins:   remainingAmount,
+					}
+				}
+			}
+
+			bz, err = cdc.Marshaler.MarshalJSON(&bankGenesis)
+			if err != nil {
+				return err
+			}
+			newGenesisState[banktypes.ModuleName] = bz
+
+			bz, err = tmjson.Marshal(newGenesisState)
+			if err != nil {
+				return err
+			}
 			newGenesis.AppState = bz
 			genDocBytes, err := tmjson.MarshalIndent(newGenesis, "", "  ")
 			if err != nil {

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	passage "github.com/envadiv/Passage3D/app"
 	"github.com/spf13/cobra"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -14,10 +16,17 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 )
 
+var accountsToDelegatedVesting = map[string]sdk.Coins{
+	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(4641736000000))),
+	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(274998000000))),
+	"pasg1l3rh6794pnch3xz5sp7h4dcu0lees4puywjs5f": sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(4641736000000))),
+}
+
 type AccountItem struct {
-	accountNumber uint64
-	sequence      uint64
-	pubkey        cryptotypes.PubKey
+	accountNumber    uint64
+	sequence         uint64
+	pubkey           cryptotypes.PubKey
+	delegatedVesting sdk.Coins
 }
 
 func MigrateAccounts() *cobra.Command {
@@ -58,17 +67,40 @@ func MigrateAccounts() *cobra.Command {
 				if !ok {
 					panic("failed to decode account")
 				}
-				acc.GetPubKey()
-				oldAccountsMap[acc.GetAddress().String()] = AccountItem{
-					accountNumber: acc.GetAccountNumber(),
-					sequence:      acc.GetSequence(),
-					pubkey:        acc.GetPubKey(),
-				}
 
 				if account.TypeUrl == "/cosmos.auth.v1beta1.ModuleAccount" &&
 					acc.GetAddress().String() != "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8y8axyq" { //ignore community pool as it is already created at genesis
 					moduleAccounts = append(moduleAccounts, account)
+				} else if account.TypeUrl == "/cosmos.vesting.v1beta1.PeriodicVestingAccount" {
+					vestingAcc, ok := acc.(*vestingtypes.PeriodicVestingAccount)
+					if !ok {
+						panic("failed to decode vesting account")
+					}
+
+					if delegatedVesting, ok := accountsToDelegatedVesting[acc.GetAddress().String()]; ok {
+						oldAccountsMap[acc.GetAddress().String()] = AccountItem{
+							accountNumber:    acc.GetAccountNumber(),
+							sequence:         acc.GetSequence(),
+							pubkey:           acc.GetPubKey(),
+							delegatedVesting: delegatedVesting,
+						}
+					} else {
+						oldAccountsMap[acc.GetAddress().String()] = AccountItem{
+							accountNumber:    acc.GetAccountNumber(),
+							sequence:         acc.GetSequence(),
+							pubkey:           acc.GetPubKey(),
+							delegatedVesting: vestingAcc.DelegatedVesting,
+						}
+					}
+
+				} else {
+					oldAccountsMap[acc.GetAddress().String()] = AccountItem{
+						accountNumber: acc.GetAccountNumber(),
+						sequence:      acc.GetSequence(),
+						pubkey:        acc.GetPubKey(),
+					}
 				}
+
 			}
 
 			// destination
@@ -101,11 +133,27 @@ func MigrateAccounts() *cobra.Command {
 					acc.SetAccountNumber(v.accountNumber)
 					acc.SetSequence(v.sequence)
 					acc.SetPubKey(v.pubkey)
-					a, err := cdctypes.NewAnyWithValue(acc)
-					if err != nil {
-						return err
+
+					if account.TypeUrl == "/cosmos.vesting.v1beta1.PeriodicVestingAccount" {
+						vestingAcc, ok := acc.(*vestingtypes.PeriodicVestingAccount)
+						if !ok {
+							panic("failed to decode vesting account")
+						}
+
+						vestingAcc.DelegatedVesting = v.delegatedVesting
+						any, err := cdctypes.NewAnyWithValue(vestingAcc)
+						if err != nil {
+							return err
+						}
+						destAuthGenesis.Accounts[i] = any
+					} else {
+						any, err := cdctypes.NewAnyWithValue(acc)
+						if err != nil {
+							return err
+						}
+						destAuthGenesis.Accounts[i] = any
 					}
-					destAuthGenesis.Accounts[i] = a
+
 				}
 			}
 
