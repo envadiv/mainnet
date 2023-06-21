@@ -26,10 +26,16 @@ const errorsAsWarnings = true
 
 const removeAccount = "pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q"
 
-var deductDelegation = map[string]sdk.Dec{
-	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": sdk.NewDec(5802170000000),
-	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": sdk.NewDec(1450541000000),
-	"pasg1l3rh6794pnch3xz5sp7h4dcu0lees4puywjs5f": sdk.NewDec(5802170000000),
+var repalceDelegationMap = map[string]string{
+	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": "pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj",
+	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": "pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj",
+	"pasg1l3rh6794pnch3xz5sp7h4dcu0lees4puywjs5f": "pasg1y5cqly7q25den0av2wf7vyvfxlmu724md4qvsg",
+	"pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q": "pasg1y5cqly7q25den0av2wf7vyvfxlmu724md4qvsg",
+}
+
+var addDelegationAountMap = map[string]sdk.Int{
+	"pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj": sdk.NewInt(7252711000000),
+	"pasg1y5cqly7q25den0av2wf7vyvfxlmu724md4qvsg": sdk.NewInt(9302167960000),
 }
 
 func MigrateAccountCmd() *cobra.Command {
@@ -85,7 +91,7 @@ func MigrateAccount(args []string) error {
 
 	addressToAccount := make(map[string]authtypes.AccountI) // account address to account map: old state
 	addressToIndex := make(map[string]int)                  // account address to account index: old state
-	fmt.Println(len(authState.Accounts))
+
 	for j := 0; j < len(authState.Accounts); j++ {
 		anyAccount := authState.Accounts[j]
 		account, ok := anyAccount.GetCachedValue().(authtypes.AccountI)
@@ -107,36 +113,26 @@ func MigrateAccount(args []string) error {
 			}
 
 			if nVestingAcc, ok := account.(*vesting.PeriodicVestingAccount); ok {
-				if pAccount, ok := oldAccount.(*vesting.PeriodicVestingAccount); ok {
-					if pAccount.DelegatedVesting.IsAllGT(nVestingAcc.OriginalVesting) {
-						fmt.Println("More = ", address)
-						fmt.Println("More = ", pAccount.DelegatedVesting.String())
-						// remainingBalance := pAccount.OriginalVesting.Sub(pAccount.DelegatedVesting)
-						pAccount.OriginalVesting = nVestingAcc.OriginalVesting
-						pAccount.StartTime = nVestingAcc.StartTime
-						pAccount.EndTime = nVestingAcc.EndTime
-						pAccount.VestingPeriods = nVestingAcc.VestingPeriods
-						pAccount.DelegatedVesting = nVestingAcc.DelegatedVesting // nVestingAcc.OriginalVesting.Sub(remainingBalance)
-						pAccount.DelegatedFree = nVestingAcc.DelegatedFree
-
-						// addressToVestingAmount[address] = pAccount.DelegatedVesting
-						any, err := codectypes.NewAnyWithValue(pAccount)
+				if pVestingAcc, ok := oldAccount.(*vesting.PeriodicVestingAccount); ok {
+					if pVestingAcc.DelegatedVesting.IsAllGT(nVestingAcc.OriginalVesting) {
+						nVestingAcc.AccountNumber = pVestingAcc.AccountNumber
+						nVestingAcc.Sequence = pVestingAcc.Sequence
+						nVestingAcc.PubKey = pVestingAcc.PubKey
+						any, err := codectypes.NewAnyWithValue(nVestingAcc)
 						if err != nil {
 							return err
 						}
-
 						authState.Accounts[oldIndex] = any
 					} else {
-						pAccount.OriginalVesting = nVestingAcc.OriginalVesting
-						pAccount.StartTime = nVestingAcc.StartTime
-						pAccount.EndTime = nVestingAcc.EndTime
-						pAccount.VestingPeriods = nVestingAcc.VestingPeriods
+						pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting
+						pVestingAcc.StartTime = nVestingAcc.StartTime
+						pVestingAcc.EndTime = nVestingAcc.EndTime
+						pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
 
-						any, err := codectypes.NewAnyWithValue(pAccount)
+						any, err := codectypes.NewAnyWithValue(pVestingAcc)
 						if err != nil {
 							return err
 						}
-
 						authState.Accounts[oldIndex] = any
 					}
 				} else {
@@ -144,10 +140,12 @@ func MigrateAccount(args []string) error {
 					if err != nil {
 						return err
 					}
-
 					authState.Accounts[oldIndex] = any
 				}
 			} else {
+				account.SetAccountNumber(oldAccount.GetAccountNumber())
+				account.SetSequence(oldAccount.GetSequence())
+				account.SetPubKey(oldAccount.GetPubKey())
 				any, err := codectypes.NewAnyWithValue(account)
 				if err != nil {
 					return err
@@ -163,41 +161,67 @@ func MigrateAccount(args []string) error {
 
 	// pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q account balance is set to zero, so changing account type to base account
 	for i, account := range authState.Accounts {
-		a, ok := account.GetCachedValue().(authtypes.AccountI)
+		accountI, ok := account.GetCachedValue().(authtypes.AccountI)
 		if !ok {
 			panic("failed to get account")
 		}
 
-		addr := a.GetAddress().String()
+		addr := accountI.GetAddress().String()
 		if addr == removeAccount {
-			x := authtypes.NewBaseAccount(a.GetAddress(), a.GetPubKey(), a.GetAccountNumber(), a.GetSequence())
+			x := authtypes.NewBaseAccount(accountI.GetAddress(), accountI.GetPubKey(), accountI.GetAccountNumber(), accountI.GetSequence())
 			any, err := codectypes.NewAnyWithValue(x)
 			if err != nil {
 				return err
 			}
 
 			authState.Accounts[i] = any
-			break
+		} else {
+			vestigAmount, found := addDelegationAountMap[addr]
+			if found {
+				vestingAccount, ok := accountI.(*vesting.PeriodicVestingAccount)
+				if ok {
+					vestingAccount.DelegatedVesting = vestingAccount.DelegatedVesting.Add(sdk.NewCoins(sdk.NewCoin(UPassageDenom, vestigAmount))...)
+				}
+
+				any, err := codectypes.NewAnyWithValue(vestingAccount)
+				if err != nil {
+					return err
+				}
+
+				authState.Accounts[i] = any
+			}
 		}
 	}
 
 	// add new accounts to auth state
 	for _, account := range newAccountsToAdd {
-		any, err := codectypes.NewAnyWithValue(account)
-		if err != nil {
-			panic("failed to convert to any account")
+		vestigAmount, found := addDelegationAountMap[account.GetAddress().String()]
+		if found {
+			vestingAccount, ok := account.(*vesting.PeriodicVestingAccount)
+			if ok {
+				vestingAccount.DelegatedVesting = vestingAccount.DelegatedVesting.Add(sdk.NewCoins(sdk.NewCoin(UPassageDenom, vestigAmount))...)
+			}
+
+			any, err := codectypes.NewAnyWithValue(vestingAccount)
+			if err != nil {
+				return err
+			}
+			authState.Accounts = append(authState.Accounts, any)
+		} else {
+			any, err := codectypes.NewAnyWithValue(account)
+			if err != nil {
+				panic("failed to convert to any account")
+			}
+			authState.Accounts = append(authState.Accounts, any)
 		}
-		authState.Accounts = append(authState.Accounts, any)
 	}
 
 	var bankState banktypes.GenesisState
 	cdc.Marshaler.MustUnmarshalJSON(genState[banktypes.ModuleName], &bankState)
 
-	addressToBalance := make(map[string]banktypes.Balance) // account address to balance map: old state
-	addressToBalanceIndex := make(map[string]int)          // account address to balance index: old state
+	addressToBalanceIndex := make(map[string]int) // account address to balance index: old state
 	for j := 0; j < len(bankState.Balances); j++ {
 		balance := bankState.Balances[j]
-		addressToBalance[balance.Address] = balance
 		addressToBalanceIndex[balance.Address] = j
 	}
 
@@ -229,45 +253,19 @@ func MigrateAccount(args []string) error {
 
 	// update delegations
 	var delegations stakingtypes.Delegations
-	validatorToLastPowerMap := make(map[string]int64)
-	bondedTokensToRemove := sdk.NewDec(0)
-	notBondedTokensToRemove := sdk.NewDec(0)
 	for _, delegation := range oldStakeGenesis.Delegations {
-		if delegation.DelegatorAddress == removeAccount {
-			if index, ok := validatorToIndexMap[delegation.ValidatorAddress]; ok {
-				oldStakeGenesis.Validators[index].DelegatorShares = oldStakeGenesis.Validators[index].DelegatorShares.Sub(delegation.Shares)
-				oldStakeGenesis.Validators[index].Tokens = oldStakeGenesis.Validators[index].Tokens.Sub(delegation.Shares.TruncateInt())
-				validatorToLastPowerMap[delegation.ValidatorAddress] = oldStakeGenesis.Validators[index].DelegatorShares.TruncateInt64()
-				if oldStakeGenesis.Validators[index].Status == stakingtypes.Bonded {
-					bondedTokensToRemove = bondedTokensToRemove.Add(delegation.Shares)
-				} else {
-					notBondedTokensToRemove = notBondedTokensToRemove.Add(delegation.Shares)
-				}
-			}
+		repalceAddr, found := repalceDelegationMap[delegation.DelegatorAddress]
+		if found {
+			delegations = append(delegations, stakingtypes.Delegation{
+				DelegatorAddress: repalceAddr,
+				ValidatorAddress: delegation.ValidatorAddress,
+				Shares:           delegation.Shares,
+			})
 		} else {
-			if _, ok := deductDelegation[delegation.DelegatorAddress]; ok {
-				if index, ok := validatorToIndexMap[delegation.ValidatorAddress]; ok {
-					oldStakeGenesis.Validators[index].DelegatorShares = oldStakeGenesis.Validators[index].DelegatorShares.Sub(delegation.Shares)
-					oldStakeGenesis.Validators[index].Tokens = oldStakeGenesis.Validators[index].Tokens.Sub(delegation.Shares.TruncateInt())
-					validatorToLastPowerMap[delegation.ValidatorAddress] = oldStakeGenesis.Validators[index].DelegatorShares.TruncateInt64()
-					if oldStakeGenesis.Validators[index].Status == stakingtypes.Bonded {
-						bondedTokensToRemove = bondedTokensToRemove.Add(delegation.Shares)
-					} else {
-						notBondedTokensToRemove = notBondedTokensToRemove.Add(delegation.Shares)
-					}
-				}
-			} else {
-				delegations = append(delegations, delegation)
-			}
+			delegations = append(delegations, delegation)
 		}
 	}
 
-	// update validator's last power
-	for i, lastPower := range oldStakeGenesis.LastValidatorPowers {
-		if power, ok := validatorToLastPowerMap[lastPower.Address]; ok {
-			oldStakeGenesis.LastValidatorPowers[i].Power = power
-		}
-	}
 	oldStakeGenesis.Delegations = delegations
 
 	// update distribution VP
@@ -280,24 +278,22 @@ func MigrateAccount(args []string) error {
 
 	for i := 0; i < len(distrGenesis.DelegatorStartingInfos); i++ {
 		distr := distrGenesis.DelegatorStartingInfos[i]
-		if distr.DelegatorAddress == removeAccount {
-			continue
-		} else if _, ok := deductDelegation[distr.DelegatorAddress]; ok {
-			continue
+		replaceAddr, found := repalceDelegationMap[distr.DelegatorAddress]
+		if found {
+			startingInfoRecords = append(startingInfoRecords, distributiontypes.DelegatorStartingInfoRecord{
+				DelegatorAddress: replaceAddr,
+				ValidatorAddress: distr.ValidatorAddress,
+				StartingInfo:     distr.StartingInfo,
+			})
 		} else {
 			startingInfoRecords = append(startingInfoRecords, distr)
 		}
 	}
 	distrGenesis.DelegatorStartingInfos = startingInfoRecords
 
-	// TODO: update bonded and not-bonded pool balance and bank total supply
-	var bondedPool, notBondedPool string
 	vestingAccountToRemaining := make(map[string]sdk.Coins)
 	for _, acc := range authState.Accounts {
-		switch acc.TypeUrl {
-		case "/cosmos.auth.v1beta1.BaseAccount":
-
-		case "/cosmos.vesting.v1beta1.PeriodicVestingAccount":
+		if acc.TypeUrl == "/cosmos.vesting.v1beta1.PeriodicVestingAccount" {
 			if a1, ok := acc.GetCachedValue().(authtypes.AccountI); ok {
 				if vestingAcc, ok := a1.(*vesting.PeriodicVestingAccount); ok {
 					delegated := vestingAcc.DelegatedVesting
@@ -308,50 +304,44 @@ func MigrateAccount(args []string) error {
 			} else {
 				panic("failed to decode")
 			}
-		case "/cosmos.auth.v1beta1.ModuleAccount":
-			if ma, ok := acc.GetCachedValue().(authtypes.ModuleAccountI); ok {
-				if ma.GetName() == "bonded_tokens_pool" {
-					bondedPool = ma.GetAddress().String()
-				} else if ma.GetName() == "not_bonded_tokens_pool" {
-					notBondedPool = ma.GetAddress().String()
-				}
-			}
 		}
 	}
 
+	var newAccountsBalance []banktypes.Balance
 	for _, balance := range balancesToAdd {
-		bankState.Balances = append(bankState.Balances, balance)
+		newAccountsBalance = append(newAccountsBalance, balance)
 	}
+	bankState.Balances = append(bankState.Balances, newAccountsBalance...)
+
+	airdropAmount := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
+	var supply sdk.Coins
+	communityPoolBalance := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)))
+	const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
+	const distributionModuleAddress = "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8y8axyq"
 
 	for index, balance := range bankState.Balances {
+		remaining, found := vestingAccountToRemaining[balance.Address]
 		if balance.Address == removeAccount {
-			bankState.Balances[index] = banktypes.Balance{
-				Address: balance.Address,
-				Coins:   sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(0))),
-			}
-		}
-		if remaining, exist := vestingAccountToRemaining[balance.Address]; exist {
-			bankState.Balances[index] = banktypes.Balance{
-				Address: balance.Address,
-				Coins:   remaining,
-			}
-		}
-
-		if balance.Address == bondedPool {
-			bankState.Balances[index] = banktypes.Balance{
-				Address: balance.Address,
-				Coins:   balance.Coins.Sub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, bondedTokensToRemove.TruncateInt()))),
-			}
-		}
-
-		if balance.Address == notBondedPool {
-			bankState.Balances[index] = banktypes.Balance{
-				Address: balance.Address,
-				Coins:   balance.Coins.Sub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, notBondedTokensToRemove.TruncateInt()))),
-			}
+			coins := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(0)))
+			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
+		} else if balance.Address == airdropPoolAddress { // remove claim module account balance from airdrop pool
+			coins := balance.Coins.Sub(airdropAmount)
+			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
+		} else if found {
+			updateBalanceAndSupply(&bankState.Balances[index], remaining, &supply)
+		} else if balance.Address == distributionModuleAddress { // set distribution module account balance
+			updateBalanceAndSupply(&bankState.Balances[index], communityPoolBalance, &supply)
+		} else {
+			updateBalanceAndSupply(&bankState.Balances[index], balance.Coins, &supply)
 		}
 	}
 
+	bankState.Supply = supply
+	distrGenesis.FeePool = distributiontypes.FeePool{
+		CommunityPool: sdk.NewDecCoins(sdk.NewDecCoinFromCoin(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)))),
+	}
+
+	fmt.Println("Total Supply = ", supply.String())
 	genState[authtypes.ModuleName] = cdc.Marshaler.MustMarshalJSON(&authState)
 	genState[banktypes.ModuleName] = cdc.Marshaler.MustMarshalJSON(&bankState)
 	genState[stakingtypes.ModuleName] = cdc.Marshaler.MustMarshalJSON(&oldStakeGenesis)
@@ -361,8 +351,14 @@ func MigrateAccount(args []string) error {
 	if err != nil {
 		return err
 	}
-	doc.AppState = bz
 
+	doc.AppState = bz
 	return doc.SaveAs(args[2])
 
+}
+
+// Function to update balance and supply
+func updateBalanceAndSupply(balance *banktypes.Balance, coins sdk.Coins, supply *sdk.Coins) {
+	*supply = supply.Add(coins...)
+	balance.Coins = coins
 }
