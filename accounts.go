@@ -20,11 +20,13 @@ import (
 	"github.com/tendermint/tendermint/types"
 )
 
-var genesisTime = time.Now().UTC().AddDate(0, 0, 5) // TODO: update genesis time
+var genesisTime = time.Now().UTC().AddDate(0, 0, 15) // TODO: update genesis time
+var airdropModuleAccountAmount = sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
 
 const errorsAsWarnings = true
 
 const removeAccount = "pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q"
+const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
 
 var repalceDelegationMap = map[string]string{
 	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": "pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj",
@@ -49,11 +51,9 @@ func MigrateAccountCmd() *cobra.Command {
 			if err := MigrateAccount(args); err != nil {
 				panic(err)
 			}
-
 			return nil
 		},
 	}
-
 	return cmd
 }
 
@@ -124,11 +124,19 @@ func MigrateAccount(args []string) error {
 						}
 						authState.Accounts[oldIndex] = any
 					} else {
-						pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting
-						pVestingAcc.StartTime = nVestingAcc.StartTime
-						pVestingAcc.EndTime = nVestingAcc.EndTime
-						pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
-
+						if pVestingAcc.GetAddress().String() == airdropPoolAddress {
+							pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting.Sub(airdropModuleAccountAmount)
+							pVestingAcc.StartTime = nVestingAcc.StartTime
+							pVestingAcc.EndTime = nVestingAcc.EndTime
+							pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
+							pVestingAcc.DelegatedFree = sdk.Coins{}
+						} else {
+							pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting
+							pVestingAcc.StartTime = nVestingAcc.StartTime
+							pVestingAcc.EndTime = nVestingAcc.EndTime
+							pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
+							pVestingAcc.DelegatedFree = sdk.Coins{}
+						}
 						any, err := codectypes.NewAnyWithValue(pVestingAcc)
 						if err != nil {
 							return err
@@ -153,13 +161,12 @@ func MigrateAccount(args []string) error {
 
 				authState.Accounts[oldIndex] = any
 			}
-
 		} else {
 			newAccountsToAdd = append(newAccountsToAdd, account)
 		}
 	}
 
-	// pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q account balance is set to zero, so changing account type to base account
+	// pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q account balance is set to remaining amount, so changing account type to base account
 	for i, account := range authState.Accounts {
 		accountI, ok := account.GetCachedValue().(authtypes.AccountI)
 		if !ok {
@@ -313,19 +320,19 @@ func MigrateAccount(args []string) error {
 	}
 	bankState.Balances = append(bankState.Balances, newAccountsBalance...)
 
-	airdropAmount := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
 	var supply sdk.Coins
-	communityPoolBalance := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)))
+	// community pool has extra 21302upasg tokens than genesis supply.
+	communityPoolBalance := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)).Add(sdk.NewCoin(UPassageDenom, sdk.NewInt(21302))))
 	const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
 	const distributionModuleAddress = "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8y8axyq"
 
 	for index, balance := range bankState.Balances {
 		remaining, found := vestingAccountToRemaining[balance.Address]
 		if balance.Address == removeAccount {
-			coins := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(0)))
+			coins := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(128488)))
 			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
 		} else if balance.Address == airdropPoolAddress { // remove claim module account balance from airdrop pool
-			coins := balance.Coins.Sub(airdropAmount)
+			coins := balance.Coins.Sub(airdropModuleAccountAmount)
 			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
 		} else if found {
 			updateBalanceAndSupply(&bankState.Balances[index], remaining, &supply)
@@ -338,7 +345,7 @@ func MigrateAccount(args []string) error {
 
 	bankState.Supply = supply
 	distrGenesis.FeePool = distributiontypes.FeePool{
-		CommunityPool: sdk.NewDecCoins(sdk.NewDecCoinFromCoin(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)))),
+		CommunityPool: sdk.NewDecCoins(sdk.NewDecCoinFromCoin(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000).Add(sdk.NewInt(21302))))),
 	}
 
 	fmt.Println("Total Supply = ", supply.String())
