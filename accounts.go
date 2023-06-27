@@ -20,13 +20,14 @@ import (
 	"github.com/tendermint/tendermint/types"
 )
 
-var genesisTime = time.Now().UTC().AddDate(0, 0, 15) // TODO: update genesis time
+var dateString = "2023-07-05T15:00:00Z"
 var airdropModuleAccountAmount = sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
 
 const errorsAsWarnings = true
 
 const removeAccount = "pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q"
 const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
+const claimModuleAddress = "pasg1m5dncvfv7lvpvycr23zja93fecun2kcvpfszyd"
 
 var repalceDelegationMap = map[string]string{
 	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": "pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj",
@@ -73,6 +74,9 @@ func MigrateAccount(args []string) error {
 		return err
 	}
 
+	genesisTime, err := time.Parse(time.RFC3339, dateString)
+	doc.GenesisTime = genesisTime
+
 	accounts, balances, err := buildAccounts(accountsCsv, genesisTime, auditTsv, false)
 	if err != nil {
 		return err
@@ -92,6 +96,7 @@ func MigrateAccount(args []string) error {
 	addressToAccount := make(map[string]authtypes.AccountI) // account address to account map: old state
 	addressToIndex := make(map[string]int)                  // account address to account index: old state
 
+	var nextAccountNumber uint64
 	for j := 0; j < len(authState.Accounts); j++ {
 		anyAccount := authState.Accounts[j]
 		account, ok := anyAccount.GetCachedValue().(authtypes.AccountI)
@@ -100,6 +105,9 @@ func MigrateAccount(args []string) error {
 		}
 		addressToAccount[account.GetAddress().String()] = account
 		addressToIndex[account.GetAddress().String()] = j
+		if account.GetAccountNumber() > nextAccountNumber {
+			nextAccountNumber = account.GetAccountNumber() + 1
+		}
 	}
 
 	var newAccountsToAdd []authtypes.AccountI
@@ -124,19 +132,11 @@ func MigrateAccount(args []string) error {
 						}
 						authState.Accounts[oldIndex] = any
 					} else {
-						if pVestingAcc.GetAddress().String() == airdropPoolAddress {
-							pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting.Sub(airdropModuleAccountAmount)
-							pVestingAcc.StartTime = nVestingAcc.StartTime
-							pVestingAcc.EndTime = nVestingAcc.EndTime
-							pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
-							pVestingAcc.DelegatedFree = sdk.Coins{}
-						} else {
-							pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting
-							pVestingAcc.StartTime = nVestingAcc.StartTime
-							pVestingAcc.EndTime = nVestingAcc.EndTime
-							pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
-							pVestingAcc.DelegatedFree = sdk.Coins{}
-						}
+						pVestingAcc.OriginalVesting = nVestingAcc.OriginalVesting
+						pVestingAcc.StartTime = nVestingAcc.StartTime
+						pVestingAcc.EndTime = nVestingAcc.EndTime
+						pVestingAcc.VestingPeriods = nVestingAcc.VestingPeriods
+						pVestingAcc.DelegatedFree = sdk.Coins{}
 						any, err := codectypes.NewAnyWithValue(pVestingAcc)
 						if err != nil {
 							return err
@@ -162,7 +162,9 @@ func MigrateAccount(args []string) error {
 				authState.Accounts[oldIndex] = any
 			}
 		} else {
+			account.SetAccountNumber(nextAccountNumber)
 			newAccountsToAdd = append(newAccountsToAdd, account)
+			nextAccountNumber++
 		}
 	}
 
@@ -250,7 +252,6 @@ func MigrateAccount(args []string) error {
 	}
 
 	// validators index
-
 	validatorToStatusMap := make(map[string]stakingtypes.BondStatus) // validator to status map
 	validatorToIndexMap := make(map[string]int)                      // validator to index map
 	for index, validator := range oldStakeGenesis.Validators {
@@ -325,6 +326,8 @@ func MigrateAccount(args []string) error {
 	communityPoolBalance := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)).Add(sdk.NewCoin(UPassageDenom, sdk.NewInt(21302))))
 	const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
 	const distributionModuleAddress = "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8y8axyq"
+	const publicSaleAccount = "pasg1vl7u3a9p37ajemv7wyvuegh7mhujtmdvpt8apu"
+	const emergencyWallet = "pasg12efyfpq0wthk5vjhnepfwj5qpxqutnn6772t38"
 
 	for index, balance := range bankState.Balances {
 		remaining, found := vestingAccountToRemaining[balance.Address]
@@ -334,10 +337,22 @@ func MigrateAccount(args []string) error {
 		} else if balance.Address == airdropPoolAddress { // remove claim module account balance from airdrop pool
 			coins := balance.Coins.Sub(airdropModuleAccountAmount)
 			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
+		} else if balance.Address == claimModuleAddress {
+			coins := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.ZeroInt())) // set claim module account balance to zero.
+			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
 		} else if found {
 			updateBalanceAndSupply(&bankState.Balances[index], remaining, &supply)
 		} else if balance.Address == distributionModuleAddress { // set distribution module account balance
 			updateBalanceAndSupply(&bankState.Balances[index], communityPoolBalance, &supply)
+		} else if balance.Address == publicSaleAccount {
+			// Deduct 1000 PASG from the public sale wallet and credit them into the
+			// emergency wallet address for future proposals and transfers.
+			updateBalanceAndSupply(&bankState.Balances[index],
+				balance.Coins.Sub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(1000000000)))), &supply)
+		} else if balance.Address == emergencyWallet {
+			// Deduct 1000 PASG from the public sale wallet and credit them into the
+			// emergency wallet address for future proposals and transfers.
+			updateBalanceAndSupply(&bankState.Balances[index], balance.Coins.Add(sdk.NewCoin(UPassageDenom, sdk.NewInt(1000000000))), &supply)
 		} else {
 			updateBalanceAndSupply(&bankState.Balances[index], balance.Coins, &supply)
 		}
