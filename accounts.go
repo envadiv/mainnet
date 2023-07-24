@@ -20,7 +20,7 @@ import (
 	"github.com/tendermint/tendermint/types"
 )
 
-var dateString = "2023-07-05T15:00:00Z"
+var dateString = "2023-07-31T15:00:00Z"
 var airdropModuleAccountAmount = sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
 
 const errorsAsWarnings = true
@@ -29,16 +29,18 @@ const removeAccount = "pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q"
 const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
 const claimModuleAddress = "pasg1m5dncvfv7lvpvycr23zja93fecun2kcvpfszyd"
 
+// repalceDelegationMap is a map for replacing delegation records from -> to
 var repalceDelegationMap = map[string]string{
 	"pasg1qf755atr9rxy24t5ccnsctln04u8qzplt7x3qx": "pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj",
-	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": "pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj",
+	"pasg12ktnvjqvv39x8pta82f55fc4n7k2rnn4r7sy8f": "pasg1nuy2gqml733yxn4dgkunyhft9w02trctksudcn",
 	"pasg1l3rh6794pnch3xz5sp7h4dcu0lees4puywjs5f": "pasg1y5cqly7q25den0av2wf7vyvfxlmu724md4qvsg",
 	"pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q": "pasg1y5cqly7q25den0av2wf7vyvfxlmu724md4qvsg",
 }
 
-var addDelegationAountMap = map[string]sdk.Int{
-	"pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj": sdk.NewInt(7252711000000),
+var addDelegationAmountMap = map[string]sdk.Int{
+	"pasg1t70qczjpxdtpwftyw750cmud7jzyc94gn90syj": sdk.NewInt(5802170000000),
 	"pasg1y5cqly7q25den0av2wf7vyvfxlmu724md4qvsg": sdk.NewInt(9302167960000),
+	"pasg1nuy2gqml733yxn4dgkunyhft9w02trctksudcn": sdk.NewInt(1450541000000),
 }
 
 func MigrateAccountCmd() *cobra.Command {
@@ -185,7 +187,7 @@ func MigrateAccount(args []string) error {
 
 			authState.Accounts[i] = any
 		} else {
-			vestigAmount, found := addDelegationAountMap[addr]
+			vestigAmount, found := addDelegationAmountMap[addr]
 			if found {
 				vestingAccount, ok := accountI.(*vesting.PeriodicVestingAccount)
 				if ok {
@@ -204,7 +206,7 @@ func MigrateAccount(args []string) error {
 
 	// add new accounts to auth state
 	for _, account := range newAccountsToAdd {
-		vestigAmount, found := addDelegationAountMap[account.GetAddress().String()]
+		vestigAmount, found := addDelegationAmountMap[account.GetAddress().String()]
 		if found {
 			vestingAccount, ok := account.(*vesting.PeriodicVestingAccount)
 			if ok {
