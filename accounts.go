@@ -20,7 +20,7 @@ import (
 	"github.com/tendermint/tendermint/types"
 )
 
-var dateString = "2023-07-31T15:00:00Z"
+var dateString = "2023-07-28T15:00:00Z"
 var airdropModuleAccountAmount = sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
 
 const errorsAsWarnings = true
