@@ -20,7 +20,7 @@ import (
 	"github.com/tendermint/tendermint/types"
 )
 
-var dateString = "2023-07-28T15:00:00Z"
+var dateString = "2023-07-31T15:00:00Z"
 var airdropModuleAccountAmount = sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(18946800000000)))
 
 const errorsAsWarnings = true
@@ -28,6 +28,7 @@ const errorsAsWarnings = true
 const removeAccount = "pasg197h5mwfpj3znhrcngjy36x4esaq8y0pmg7zp9q"
 const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
 const claimModuleAddress = "pasg1m5dncvfv7lvpvycr23zja93fecun2kcvpfszyd"
+const foundryWalletAddress = "pasg1sap5junfzydgqcll4ezyl4sh4yeekl64qkna34"
 
 // repalceDelegationMap is a map for replacing delegation records from -> to
 var repalceDelegationMap = map[string]string{
@@ -326,7 +327,6 @@ func MigrateAccount(args []string) error {
 	var supply sdk.Coins
 	// community pool has extra 21302upasg tokens than genesis supply.
 	communityPoolBalance := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(150000000000000)).Add(sdk.NewCoin(UPassageDenom, sdk.NewInt(21302))))
-	const airdropPoolAddress = "pasg1lel0s624jr9zsz4ml6yv9e5r4uzukfs7hwh22w"
 	const distributionModuleAddress = "pasg1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8y8axyq"
 	const publicSaleAccount = "pasg1vl7u3a9p37ajemv7wyvuegh7mhujtmdvpt8apu"
 	const emergencyWallet = "pasg12efyfpq0wthk5vjhnepfwj5qpxqutnn6772t38"
@@ -336,21 +336,31 @@ func MigrateAccount(args []string) error {
 		if balance.Address == removeAccount {
 			coins := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(128488)))
 			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
-		} else if balance.Address == airdropPoolAddress { // remove claim module account balance from airdrop pool
-			coins := balance.Coins.Sub(airdropModuleAccountAmount)
+		} else if balance.Address == airdropPoolAddress {
+			// Add genesis unlocked amount to airdrop pool balance
+			// and deduct claim module module account balance from it.
+			coins := balance.Coins.Add(sdk.NewCoin(UPassageDenom, sdk.NewInt(73500000000000)))
+			coins = coins.Sub(airdropModuleAccountAmount)
 			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
 		} else if balance.Address == claimModuleAddress {
 			coins := sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.ZeroInt())) // set claim module account balance to zero.
 			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
-		} else if found {
+		} else if found && (balance.Address != publicSaleAccount && balance.Address != foundryWalletAddress) {
 			updateBalanceAndSupply(&bankState.Balances[index], remaining, &supply)
+		} else if balance.Address == foundryWalletAddress {
+			coins := balance.Coins
+			coins = coins.Add(sdk.NewInt64Coin(UPassageDenom, 60000000000000))
+			updateBalanceAndSupply(&bankState.Balances[index], coins, &supply)
 		} else if balance.Address == distributionModuleAddress { // set distribution module account balance
 			updateBalanceAndSupply(&bankState.Balances[index], communityPoolBalance, &supply)
 		} else if balance.Address == publicSaleAccount {
-			// Deduct 1000 PASG from the public sale wallet and credit them into the
+			// Add genesis unlocked amount to available balance
+			// and deduct 1000 PASG from the public sale wallet and credit them into the
 			// emergency wallet address for future proposals and transfers.
+			coins := balance.Coins
+			coins = coins.Add(sdk.NewInt64Coin(UPassageDenom, 30000000000000))
 			updateBalanceAndSupply(&bankState.Balances[index],
-				balance.Coins.Sub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(1000000000)))), &supply)
+				coins.Sub(sdk.NewCoins(sdk.NewCoin(UPassageDenom, sdk.NewInt(1000000000)))), &supply)
 		} else if balance.Address == emergencyWallet {
 			// Deduct 1000 PASG from the public sale wallet and credit them into the
 			// emergency wallet address for future proposals and transfers.
@@ -359,6 +369,8 @@ func MigrateAccount(args []string) error {
 			updateBalanceAndSupply(&bankState.Balances[index], balance.Coins, &supply)
 		}
 	}
+
+	fmt.Println(nextAccountNumber)
 
 	bankState.Supply = supply
 	distrGenesis.FeePool = distributiontypes.FeePool{
