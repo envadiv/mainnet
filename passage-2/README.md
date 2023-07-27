@@ -65,7 +65,9 @@ it should display the following details:
 name: passage
 server_name: passage
 version: v2.0.0
-TBD
+commit: a8148052a7aed65b45c453bf3accb5bafb496a11
+build_tags: netgo ledger,
+go: go version go1.20.6 linux/amd64
 ```
 
 #### Download the updated genesis file and wipe the previous data
