@@ -9,15 +9,15 @@ import (
 	"path/filepath"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	passage "github.com/envadiv/Passage3D/app"
-	"github.com/tendermint/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distribution "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	passage "github.com/envadiv/Passage3D/app"
 	"github.com/spf13/cobra"
+	"github.com/tendermint/tendermint/types"
 )
 
 const CommunityPoolPassage3DAmount = 59_750_485
@@ -67,6 +67,7 @@ func main() {
 	rootCmd.AddCommand(AddClaimRecords())
 	// address converter
 	rootCmd.AddCommand(AddressConverter())
+	rootCmd.AddCommand(MigrateAccountCmd())
 
 	err := rootCmd.Execute()
 	if err != nil {
