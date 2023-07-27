@@ -79,7 +79,7 @@ passage tendermint unsafe-reset-all --home ~/.passage
 
 #### Verify genesis
 ```sh    
-jq -S -c -M '' ~/.passage/config/genesis.json | shasum -a 256```
+jq -S -c -M '' ~/.passage/config/genesis.json | shasum -a 256``
 It should be equal to the contents in [checksum](checksum.txt)
 ```
 
