@@ -8,14 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/envadiv/Passage3D/app"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/envadiv/Passage3D/app"
 )
 
 type Record struct {
-	Address                 sdk.AccAddress
-	TotalAmount             Dec
-	StartTime               time.Time
+	Address                sdk.AccAddress
+	TotalAmount            Dec
+	StartTime              time.Time
 	NumWeeklyDistributions int
 }
 
@@ -118,9 +118,9 @@ func parseLine(line []string, genesisTime time.Time) (Record, error) {
 	// }
 
 	return Record{
-		Address:                 addr,
-		TotalAmount:             amount,
-		StartTime:               startTime,
+		Address:                addr,
+		TotalAmount:            amount,
+		StartTime:              startTime,
 		NumWeeklyDistributions: numDist,
 	}, nil
 
