@@ -1,6 +1,8 @@
 # Passage Relaunch Instructions 
 
-**Please note that this genesis file has been updated after taking a state export of `passage-1` at height 4088500. Validators who were validating on `passage-1` have to REUSE the signing key(priv_validator-key.json) to validate on `passage-2`**
+**1. Please note that this genesis file has been updated after taking a state export of `passage-1` at height 4088500. Validators who were validating on `passage-1` have to REUSE the signing key(priv_validator-key.json) to validate on `passage-2`**
+
+**2. Please remove the halt-height setting from your app config i.e., `~/.passage/config/app.toml`. Set the halt-height to `0` before starting your nodes**
 
 ## Node Requirements
 
