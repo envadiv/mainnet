@@ -1,1 +1,2 @@
 https://services.staketab.com/snapshots/passage
+https://snapshot.huginn.tech/mainnet/passage/
