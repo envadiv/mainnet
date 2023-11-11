@@ -72,6 +72,12 @@ build_tags: netgo ledger,
 go: go version go1.20.6 linux/amd64
 ```
 
+**Init Binary**
+```sh
+PASSAGE_MONIKER="Replace_AviaOne_by_your_name"
+passage init $PASSAGE_MONIKER --chain-id passage-2
+```
+
 #### Download the updated genesis file and wipe the previous data
 
 ```sh
@@ -87,11 +93,18 @@ It should be equal to the contents in [checksum](checksum.txt)
 
 #### Update seeds
 
-Open `~/.passage/config/config.toml` and update `seeds` (comma separated list)
+SEEDS="ad9f93c38fafff854cdd65741df556d043dd6edb@5.161.71.7:26656,fbdcc82eeacc81f9ef7d77d22120f4567457c850@5.161.184.142:26656"
+sed -i -e "s|^seeds *=.*|seeds = \"$SEEDS\"|" $HOME/.passage/config/config.toml
 
 ```
 ad9f93c38fafff854cdd65741df556d043dd6edb@5.161.71.7:26656
 fbdcc82eeacc81f9ef7d77d22120f4567457c850@5.161.184.142:26656
+```
+
+#### Add your wallet used with the chain passage-1
+
+```
+passage keys add NAME_WALLET --recover
 ```
 
 #### Start the passage services
