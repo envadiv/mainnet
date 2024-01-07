@@ -53,7 +53,7 @@ mkdir -p $GOPATH/src/github.com/envadiv
 cd $GOPATH/src/github.com/envadiv
 git clone https://github.com/envadiv/Passage3D && cd Passage3D
 git fetch
-git checkout v2.0.0
+git checkout v2.2.0
 make install
 ```
 
@@ -66,8 +66,8 @@ it should display the following details:
 ```sh
 name: passage
 server_name: passage
-version: v2.0.0
-commit: a8148052a7aed65b45c453bf3accb5bafb496a11
+version: v2.2.0
+commit: 5377e66a3d7d2eafe7aad19299a6d9985ae63604
 build_tags: netgo ledger,
 go: go version go1.20.6 linux/amd64
 ```
@@ -90,8 +90,8 @@ It should be equal to the contents in [checksum](checksum.txt)
 Open `~/.passage/config/config.toml` and update `seeds` (comma separated list)
 
 ```
-ad9f93c38fafff854cdd65741df556d043dd6edb@5.161.71.7:26656
-fbdcc82eeacc81f9ef7d77d22120f4567457c850@5.161.184.142:26656
+b6beabfb9309330944f44a1686742c2751748b83@5.161.71.7:26656
+aebb8431609cb126a977592446f5de252d8b7fa1@104.236.201.138:26656
 ```
 
 #### Start the passage services
