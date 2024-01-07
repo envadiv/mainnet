@@ -37,12 +37,12 @@ mv claim-passage-genesis.json <chain-id>/genesis.json
 
 ### Requirements
 
-Check out these [instructions](./passage-1/README.md#node-requirements) for installing `passage@v1.0.0`
+Check out these [instructions](./passage-2/README.md#node-requirements) for installing `passage@v2.2.0`
 
 If you haven't initialized your node, init passage chain by running
 
 ```sh
-passage init --chain-id passage-1 <my_node_moniker>
+passage init --chain-id passage-2 <my_node_moniker>
 ```
 
 ### Start your validator node
@@ -56,22 +56,22 @@ passage init --chain-id passage-1 <my_node_moniker>
     ```sh
     name: passage
     server_name: passage
-    version: v1.0.0
-    commit: 6ae7171e42f24203dc11369e7aef6d590bd09a47
+    version: v2.2.0
+    commit: 5377e66a3d7d2eafe7aad19299a6d9985ae63604
     build_tags: netgo,ledger
-    go: go version go1.17 linux/amd64
+    go: go version go1.20.6 linux/amd64
     ```
 
 - Step-2: Download the mainnet genesis
     ```sh
-    curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-1/genesis.json > ~/.passage/config/genesis.json
+    curl -s https://raw.githubusercontent.com/envadiv/mainnet/main/passage-2/genesis.json > ~/.passage/config/genesis.json
     ```
 
 - Step-3: Verify genesis
     ```sh
     jq -S -c -M '' ~/.passage/config/genesis.json | shasum -a 256
     ```
-    It should be equal to the contents in [checksum](passage-1/checksum.txt)
+    It should be equal to the contents in [checksum](passage-2/checksum.txt)
 
 - Step-4: Update seeds and persistent peers
 
@@ -146,7 +146,7 @@ passage tx staking create-validator \
   --amount=9000000upasg \
   --pubkey=$(passage tendermint show-validator) \
   --moniker="<your_moniker>" \
-  --chain-id=passage-1 \
+  --chain-id=passage-2 \
   --commission-rate="0.05" \
   --commission-max-rate="0.10" \
   --commission-max-change-rate="0.01" \
