@@ -33,6 +33,32 @@ Note: This will create a new genesis file from the input (`claim-passage-genesis
 mv claim-passage-genesis.json <chain-id>/genesis.json
 ```
 
+## passage-2 status
+
+| | |
+|---|---|
+| Chain ID | `passage-2` |
+| Running version | v4.0.3 ([release](https://github.com/envadiv/Passage3D/releases/tag/v4.0.3)) |
+| Next upgrade | v4.1.0, CosmWasm security upgrade: release published, governance proposal not submitted yet ([instructions](passage-2/upgrades/v4.1.0.md)) |
+| Minimum gas price | `12.5upasg` |
+
+### Upgrade history
+
+Heights from the chain (`passage q upgrade applied <name>`).
+
+| Upgrade | Height | Instructions |
+|---|---|---|
+| v2.2.0 | 5288888 | [v2.2.0.md](passage-2/upgrades/v2.2.0.md) |
+| v2.4.0 | 7080900 | [v2.4.0.md](passage-2/upgrades/v2.4.0.md) |
+| v2.5.0 | 13331493 | [v2.5.0.md](passage-2/upgrades/v2.5.0.md) |
+| v2.6.0 | 14273627 | [v2.6.0.md](passage-2/upgrades/v2.6.0.md) |
+| v3.0.0 | 19807986 | [v3.0.0.md](passage-2/upgrades/v3.0.0.md) |
+| v4.0.0 | 19950687 | [v4.0.0.md](passage-2/upgrades/v4.0.0.md) |
+| v4.0.2 | 20114000 | [release](https://github.com/envadiv/Passage3D/releases/tag/v4.0.2) |
+| v4.1.0 | to be announced | [v4.1.0.md](passage-2/upgrades/v4.1.0.md) |
+
+v4.0.3 is a maintenance release on the v4.0.2 state machine; it needs no upgrade height.
+
 ## Join as a validator
 
 ### Requirements
